@@ -6,6 +6,7 @@
 <title>ARCADE VAULT — Game Loader</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js"></script>
 <style>
   :root {
     --bg: #05050f;
@@ -448,6 +449,10 @@
             <span class="file-tag">.py</span>
             <span class="file-tag">.bat</span>
             <span class="file-tag">.zip</span>
+            <span class="file-tag">.tar</span>
+            <span class="file-tag">.tar.gz</span>
+            <span class="file-tag">.tgz</span>
+            <span class="file-tag">.gz</span>
             <span class="file-tag">.png</span>
             <span class="file-tag">.jpeg</span>
             <span class="file-tag">.gif</span>
@@ -602,13 +607,37 @@
     wav: { icon:'🎵', label:'AUDIO FILE', viewer:'binary' },
     zip: { icon:'📦', label:'ZIP GAME', viewer:'zip' },
     rar: { icon:'📦', label:'RAR ARCHIVE', viewer:'binary' },
+    tar: { icon:'📦', label:'TAR ARCHIVE', viewer:'zip' },
+    gz:  { icon:'📦', label:'GZ ARCHIVE',  viewer:'zip' },
+    tgz: { icon:'📦', label:'TGZ GAME',    viewer:'zip' },
+    bz2: { icon:'📦', label:'BZ2 ARCHIVE', viewer:'binary' },
+    '7z':{ icon:'📦', label:'7Z ARCHIVE',  viewer:'binary' },
     exe: { icon:'⚙', label:'EXECUTABLE', viewer:'binary' },
     pdf: { icon:'📑', label:'PDF DOCUMENT', viewer:'frame' },
   };
 
+  // Archive extensions that we can extract
+  const ARCHIVE_EXTS = new Set(['zip','tar','gz','tgz']);
+
   function getFileType(name) {
-    const ext = name.split('.').pop().toLowerCase();
+    const lower = name.toLowerCase();
+    // Handle compound extensions first
+    if(lower.endsWith('.tar.gz') || lower.endsWith('.tar.bz2') || lower.endsWith('.tar.xz')) {
+      return { icon:'📦', label:'TAR.GZ GAME', viewer:'zip' };
+    }
+    const ext = lower.split('.').pop();
     return typeMap[ext] || { icon:'❓', label:ext.toUpperCase()+' FILE', viewer:'binary' };
+  }
+
+  // Detect archive format from filename
+  function detectArchiveFormat(name) {
+    const lower = name.toLowerCase();
+    if(lower.endsWith('.tar.gz') || lower.endsWith('.tgz')) return 'tgz';
+    if(lower.endsWith('.tar.bz2') || lower.endsWith('.tar.xz')) return 'tar-other';
+    if(lower.endsWith('.tar')) return 'tar';
+    if(lower.endsWith('.gz')) return 'gz';
+    if(lower.endsWith('.zip')) return 'zip';
+    return 'unknown';
   }
 
   function formatSize(bytes) {
@@ -742,9 +771,9 @@
         setStatus('PARSED');
       };
       reader.readAsText(f);
-    } else if(f.name.split('.').pop().toLowerCase() === 'zip') {
-      // ZIP: extract and launch
-      loadZip(f);
+    } else if(t.viewer === 'zip') {
+      // Archive: extract and launch
+      loadArchive(f);
     } else {
       // Binary
       const bv = document.getElementById('binaryView');
@@ -787,106 +816,193 @@
     return score;
   }
 
-  async function loadZip(f) {
+  async function loadArchive(f) {
+    const format = detectArchiveFormat(f.name);
     setStatus('EXTRACTING...');
-    document.getElementById('viewerBadge').textContent = 'ZIP GAME';
+    document.getElementById('viewerBadge').textContent = format.toUpperCase() + ' GAME';
 
     try {
-      const zip = await JSZip.loadAsync(f);
+      let fileMap = {}; // path → Uint8Array
 
-      // Build a map: normalised path → blob URL
-      const blobMap = {};
-      const htmlFiles = [];
-      const extractPromises = [];
-
-      zip.forEach((relPath, entry) => {
-        if(entry.dir) return;
-        // Skip macOS junk
-        if(relPath.startsWith('__MACOSX') || relPath.includes('.DS_Store')) return;
-        const mime = getMime(relPath);
-        const p = entry.async('arraybuffer').then(buf => {
-          const blob = new Blob([buf], { type: mime });
-          const url = URL.createObjectURL(blob);
-          blobMap[relPath] = url;
-          if(mime === 'text/html') htmlFiles.push(relPath);
-        });
-        extractPromises.push(p);
-      });
-
-      await Promise.all(extractPromises);
-
-      if(htmlFiles.length === 0) {
-        showToast('No HTML entry point found in ZIP');
-        setStatus('NO HTML FOUND');
-        const bv = document.getElementById('binaryView');
-        bv.style.display = 'flex';
-        document.getElementById('binaryIcon').textContent = '📦';
-        document.getElementById('binaryInfo').innerHTML =
-          `No HTML file found in this ZIP.\nFiles inside: <span>${Object.keys(blobMap).length}</span>\nZIP size: <span>${formatSize(f.size)}</span>`;
-        return;
+      if(format === 'zip') {
+        fileMap = await extractZip(f);
+      } else if(format === 'tgz') {
+        fileMap = await extractTgz(f);
+      } else if(format === 'tar') {
+        fileMap = await extractTar(f);
+      } else if(format === 'gz') {
+        // Single-file gzip — decompress and treat as a single file
+        fileMap = await extractGz(f);
+      } else {
+        throw new Error('Unsupported archive format: ' + format);
       }
 
-      // Pick best entry point
-      htmlFiles.sort((a,b) => entryScore(a) - entryScore(b));
-      const entryPath = htmlFiles[0];
-
-      // Determine the folder prefix (strip the filename)
-      const entryDir = entryPath.includes('/') ? entryPath.substring(0, entryPath.lastIndexOf('/') + 1) : '';
-
-      // Read the entry HTML text and rewrite all asset references
-      const entryEntry = zip.file(entryPath);
-      let html = await entryEntry.async('string');
-
-      // Replace src/href/url() references with blob URLs
-      // We replace quoted paths: src="...", href="...", url("..."), url('...')
-      html = html.replace(/(src|href|action)=["']([^"'#?]+)["']/gi, (match, attr, val) => {
-        if(val.startsWith('http') || val.startsWith('//') || val.startsWith('data:')) return match;
-        const resolved = resolveZipPath(entryDir, val);
-        const blobUrl = blobMap[resolved] || blobMap[val];
-        if(blobUrl) return `${attr}="${blobUrl}"`;
-        return match;
-      });
-
-      // CSS url() references
-      html = html.replace(/url\(["']?([^"')]+)["']?\)/gi, (match, val) => {
-        if(val.startsWith('http') || val.startsWith('//') || val.startsWith('data:')) return match;
-        const resolved = resolveZipPath(entryDir, val);
-        const blobUrl = blobMap[resolved] || blobMap[val];
-        if(blobUrl) return `url("${blobUrl}")`;
-        return match;
-      });
-
-      // ES module import statements  import ... from '...'
-      html = html.replace(/import\s+([^'"]*from\s+)?["']([^"']+)["']/gi, (match, pre, val) => {
-        if(val.startsWith('http') || val.startsWith('//')) return match;
-        const resolved = resolveZipPath(entryDir, val);
-        const blobUrl = blobMap[resolved] || blobMap[val];
-        if(blobUrl) return `import ${pre||''}"${blobUrl}"`;
-        return match;
-      });
-
-      // Inject into iframe as blob
-      const finalBlob = new Blob([html], { type: 'text/html' });
-      const finalUrl = URL.createObjectURL(finalBlob);
-
-      // Track all blob URLs for later cleanup
-      state.zipBlobUrls = Object.values(blobMap).concat([finalUrl]);
-      state.activeURL = finalUrl;
-      state.zipEntryHTML = html; // save for openInBlank
-
-      const frame = document.getElementById('gameFrame');
-      frame.style.display = 'block';
-      frame.src = finalUrl;
-      frame.onload = () => setStatus('RUNNING');
-
-      const fileCount = Object.keys(blobMap).length;
-      showToast(`ZIP loaded — ${fileCount} files, entry: ${entryPath.split('/').pop()}`);
+      await renderArchiveFiles(fileMap, f);
 
     } catch(err) {
       console.error(err);
-      showToast('ZIP error: ' + err.message);
+      showToast('Archive error: ' + err.message);
       setStatus('ERROR');
     }
+  }
+
+  // ── Extractors ────────────────────────────────────────────────────────────
+
+  async function extractZip(f) {
+    const zip = await JSZip.loadAsync(f);
+    const fileMap = {};
+    const promises = [];
+    zip.forEach((relPath, entry) => {
+      if(entry.dir) return;
+      if(relPath.startsWith('__MACOSX') || relPath.includes('.DS_Store')) return;
+      promises.push(entry.async('uint8array').then(data => { fileMap[relPath] = data; }));
+    });
+    await Promise.all(promises);
+    return fileMap;
+  }
+
+  async function extractTgz(f) {
+    // Read file as ArrayBuffer, decompress gzip, then parse tar
+    const buf = await readFileAsArrayBuffer(f);
+    const uint8 = new Uint8Array(buf);
+    const decompressed = fflate.decompressSync(uint8);
+    return parseTar(decompressed);
+  }
+
+  async function extractTar(f) {
+    const buf = await readFileAsArrayBuffer(f);
+    return parseTar(new Uint8Array(buf));
+  }
+
+  async function extractGz(f) {
+    // Single gzip file — decompress and expose under the original name minus .gz
+    const buf = await readFileAsArrayBuffer(f);
+    const decompressed = fflate.decompressSync(new Uint8Array(buf));
+    const innerName = f.name.replace(/\.gz$/i, '') || 'file';
+    return { [innerName]: decompressed };
+  }
+
+  function readFileAsArrayBuffer(f) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = e => res(e.target.result);
+      r.onerror = () => rej(new Error('File read failed'));
+      r.readAsArrayBuffer(f);
+    });
+  }
+
+  // Minimal TAR parser — supports ustar and POSIX tar
+  function parseTar(data) {
+    const fileMap = {};
+    let offset = 0;
+    const decoder = new TextDecoder();
+
+    while(offset + 512 <= data.length) {
+      const header = data.subarray(offset, offset + 512);
+
+      // Check for end-of-archive (two zero blocks)
+      let allZero = true;
+      for(let i = 0; i < 512; i++) { if(header[i] !== 0) { allZero = false; break; } }
+      if(allZero) break;
+
+      // Parse filename (bytes 0–99) + prefix (bytes 345–499 in ustar)
+      let name = decoder.decode(header.subarray(0, 100)).replace(/\0/g, '').trim();
+      const prefix = decoder.decode(header.subarray(345, 500)).replace(/\0/g, '').trim();
+      if(prefix) name = prefix + '/' + name;
+
+      // File size (bytes 124–135, octal string)
+      const sizeStr = decoder.decode(header.subarray(124, 136)).replace(/\0/g, '').trim();
+      const size = parseInt(sizeStr, 8) || 0;
+
+      // Type flag (byte 156): '0' or '\0' = regular file, '5' = directory
+      const typeFlag = String.fromCharCode(header[156]);
+
+      offset += 512; // move past header
+
+      if((typeFlag === '0' || typeFlag === '\0') && name && !name.endsWith('/')) {
+        // Skip macOS junk
+        if(!name.startsWith('__MACOSX') && !name.includes('.DS_Store')) {
+          fileMap[name] = data.subarray(offset, offset + size);
+        }
+      }
+
+      // Advance past file data (padded to 512-byte blocks)
+      offset += Math.ceil(size / 512) * 512;
+    }
+
+    return fileMap;
+  }
+
+  // ── Renderer (shared by all archive types) ────────────────────────────────
+
+  async function renderArchiveFiles(fileMap, originalFile) {
+    const blobMap = {};
+    const htmlFiles = [];
+
+    for(const [path, data] of Object.entries(fileMap)) {
+      const mime = getMime(path);
+      const blob = new Blob([data], { type: mime });
+      const url = URL.createObjectURL(blob);
+      blobMap[path] = url;
+      if(mime === 'text/html') htmlFiles.push(path);
+    }
+
+    const fileCount = Object.keys(blobMap).length;
+
+    if(htmlFiles.length === 0) {
+      showToast('No HTML entry point found in archive');
+      setStatus('NO HTML FOUND');
+      const bv = document.getElementById('binaryView');
+      bv.style.display = 'flex';
+      document.getElementById('binaryIcon').textContent = '📦';
+      document.getElementById('binaryInfo').innerHTML =
+        `No HTML file found.\nFiles inside: <span>${fileCount}</span>\nArchive size: <span>${formatSize(originalFile.size)}</span>\n\nFiles:\n<span>${Object.keys(fileMap).slice(0,20).join('\n')}${fileCount>20?'\n…and '+(fileCount-20)+' more':''}</span>`;
+      return;
+    }
+
+    // Pick best entry point
+    htmlFiles.sort((a,b) => entryScore(a) - entryScore(b));
+    const entryPath = htmlFiles[0];
+    const entryDir = entryPath.includes('/') ? entryPath.substring(0, entryPath.lastIndexOf('/') + 1) : '';
+
+    // Read entry HTML and rewrite asset references
+    const decoder = new TextDecoder();
+    let html = decoder.decode(fileMap[entryPath]);
+
+    html = html.replace(/(src|href|action)=["']([^"'#?]+)["']/gi, (match, attr, val) => {
+      if(val.startsWith('http') || val.startsWith('//') || val.startsWith('data:')) return match;
+      const resolved = resolveZipPath(entryDir, val);
+      const blobUrl = blobMap[resolved] || blobMap[val];
+      return blobUrl ? `${attr}="${blobUrl}"` : match;
+    });
+
+    html = html.replace(/url\(["']?([^"')#?]+)["']?\)/gi, (match, val) => {
+      if(val.startsWith('http') || val.startsWith('//') || val.startsWith('data:')) return match;
+      const resolved = resolveZipPath(entryDir, val);
+      const blobUrl = blobMap[resolved] || blobMap[val];
+      return blobUrl ? `url("${blobUrl}")` : match;
+    });
+
+    html = html.replace(/import\s+([^'"]*from\s+)?["']([^"']+)["']/gi, (match, pre, val) => {
+      if(val.startsWith('http') || val.startsWith('//')) return match;
+      const resolved = resolveZipPath(entryDir, val);
+      const blobUrl = blobMap[resolved] || blobMap[val];
+      return blobUrl ? `import ${pre||''}"${blobUrl}"` : match;
+    });
+
+    const finalBlob = new Blob([html], { type: 'text/html' });
+    const finalUrl = URL.createObjectURL(finalBlob);
+
+    state.zipBlobUrls = Object.values(blobMap).concat([finalUrl]);
+    state.activeURL = finalUrl;
+    state.zipEntryHTML = html;
+
+    const frame = document.getElementById('gameFrame');
+    frame.style.display = 'block';
+    frame.src = finalUrl;
+    frame.onload = () => setStatus('RUNNING');
+
+    showToast(`Loaded ${fileCount} files · entry: ${entryPath.split('/').pop()}`);
   }
 
   function resolveZipPath(baseDir, relativePath) {
@@ -932,15 +1048,15 @@
       };
       reader.readAsText(f);
 
-    } else if(ext === 'zip') {
-      // ZIP: use the already-rewritten HTML (blob URLs still valid)
+    } else if(t.viewer === 'zip') {
+      // Archive (zip/tar/tgz/gz): use already-rewritten HTML
       if(state.zipEntryHTML) {
         w.document.open();
         w.document.write(state.zipEntryHTML);
         w.document.close();
       } else {
         w.close();
-        showToast('Load the ZIP first!');
+        showToast('Load the archive first!');
         return;
       }
 
