@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>ARCADE VAULT — Game Loader</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   :root {
     --bg: #05050f;
@@ -599,7 +600,7 @@
     mp4: { icon:'🎬', label:'VIDEO FILE', viewer:'binary' },
     mp3: { icon:'🎵', label:'AUDIO FILE', viewer:'binary' },
     wav: { icon:'🎵', label:'AUDIO FILE', viewer:'binary' },
-    zip: { icon:'📦', label:'ZIP ARCHIVE', viewer:'binary' },
+    zip: { icon:'📦', label:'ZIP GAME', viewer:'zip' },
     rar: { icon:'📦', label:'RAR ARCHIVE', viewer:'binary' },
     exe: { icon:'⚙', label:'EXECUTABLE', viewer:'binary' },
     pdf: { icon:'📑', label:'PDF DOCUMENT', viewer:'frame' },
@@ -690,6 +691,8 @@
     document.getElementById('fileTypeStatus').textContent = '—';
     document.getElementById('fileSizeStatus').textContent = '—';
     if(state.activeURL) { URL.revokeObjectURL(state.activeURL); state.activeURL = null; }
+    if(state.zipBlobUrls) { state.zipBlobUrls.forEach(u => URL.revokeObjectURL(u)); state.zipBlobUrls = null; }
+    state.zipEntryHTML = null;
   }
 
   function loadFile(i) {
@@ -713,6 +716,8 @@
     document.getElementById('binaryView').style.display = 'none';
 
     if(state.activeURL) URL.revokeObjectURL(state.activeURL);
+    if(state.zipBlobUrls) { state.zipBlobUrls.forEach(u => URL.revokeObjectURL(u)); state.zipBlobUrls = null; }
+    state.zipEntryHTML = null;
 
     if(t.viewer === 'frame') {
       const url = URL.createObjectURL(f);
@@ -737,6 +742,9 @@
         setStatus('PARSED');
       };
       reader.readAsText(f);
+    } else if(f.name.split('.').pop().toLowerCase() === 'zip') {
+      // ZIP: extract and launch
+      loadZip(f);
     } else {
       // Binary
       const bv = document.getElementById('binaryView');
@@ -748,6 +756,148 @@
       state.activeURL = url;
       setStatus('BINARY');
     }
+  }
+
+  // MIME type helper for zip contents
+  function getMime(filename) {
+    const ext = filename.split('.').pop().toLowerCase();
+    const mimes = {
+      html:'text/html', htm:'text/html', css:'text/css',
+      js:'application/javascript', mjs:'application/javascript',
+      json:'application/json', xml:'application/xml', svg:'image/svg+xml',
+      png:'image/png', jpg:'image/jpeg', jpeg:'image/jpeg',
+      gif:'image/gif', webp:'image/webp', bmp:'image/bmp', ico:'image/x-icon',
+      mp3:'audio/mpeg', ogg:'audio/ogg', wav:'audio/wav',
+      mp4:'video/mp4', webm:'video/webm',
+      woff:'font/woff', woff2:'font/woff2', ttf:'font/ttf', otf:'font/otf',
+      txt:'text/plain', md:'text/plain',
+    };
+    return mimes[ext] || 'application/octet-stream';
+  }
+
+  // Rank an HTML file as a likely entry point (lower = better)
+  function entryScore(path) {
+    const name = path.split('/').pop().toLowerCase();
+    const depth = path.split('/').length - 1;
+    let score = depth * 10;
+    if(name === 'index.html' || name === 'index.htm') score -= 20;
+    if(name === 'game.html') score -= 15;
+    if(name === 'main.html') score -= 10;
+    if(name.includes('index')) score -= 5;
+    return score;
+  }
+
+  async function loadZip(f) {
+    setStatus('EXTRACTING...');
+    document.getElementById('viewerBadge').textContent = 'ZIP GAME';
+
+    try {
+      const zip = await JSZip.loadAsync(f);
+
+      // Build a map: normalised path → blob URL
+      const blobMap = {};
+      const htmlFiles = [];
+      const extractPromises = [];
+
+      zip.forEach((relPath, entry) => {
+        if(entry.dir) return;
+        // Skip macOS junk
+        if(relPath.startsWith('__MACOSX') || relPath.includes('.DS_Store')) return;
+        const mime = getMime(relPath);
+        const p = entry.async('arraybuffer').then(buf => {
+          const blob = new Blob([buf], { type: mime });
+          const url = URL.createObjectURL(blob);
+          blobMap[relPath] = url;
+          if(mime === 'text/html') htmlFiles.push(relPath);
+        });
+        extractPromises.push(p);
+      });
+
+      await Promise.all(extractPromises);
+
+      if(htmlFiles.length === 0) {
+        showToast('No HTML entry point found in ZIP');
+        setStatus('NO HTML FOUND');
+        const bv = document.getElementById('binaryView');
+        bv.style.display = 'flex';
+        document.getElementById('binaryIcon').textContent = '📦';
+        document.getElementById('binaryInfo').innerHTML =
+          `No HTML file found in this ZIP.\nFiles inside: <span>${Object.keys(blobMap).length}</span>\nZIP size: <span>${formatSize(f.size)}</span>`;
+        return;
+      }
+
+      // Pick best entry point
+      htmlFiles.sort((a,b) => entryScore(a) - entryScore(b));
+      const entryPath = htmlFiles[0];
+
+      // Determine the folder prefix (strip the filename)
+      const entryDir = entryPath.includes('/') ? entryPath.substring(0, entryPath.lastIndexOf('/') + 1) : '';
+
+      // Read the entry HTML text and rewrite all asset references
+      const entryEntry = zip.file(entryPath);
+      let html = await entryEntry.async('string');
+
+      // Replace src/href/url() references with blob URLs
+      // We replace quoted paths: src="...", href="...", url("..."), url('...')
+      html = html.replace(/(src|href|action)=["']([^"'#?]+)["']/gi, (match, attr, val) => {
+        if(val.startsWith('http') || val.startsWith('//') || val.startsWith('data:')) return match;
+        const resolved = resolveZipPath(entryDir, val);
+        const blobUrl = blobMap[resolved] || blobMap[val];
+        if(blobUrl) return `${attr}="${blobUrl}"`;
+        return match;
+      });
+
+      // CSS url() references
+      html = html.replace(/url\(["']?([^"')]+)["']?\)/gi, (match, val) => {
+        if(val.startsWith('http') || val.startsWith('//') || val.startsWith('data:')) return match;
+        const resolved = resolveZipPath(entryDir, val);
+        const blobUrl = blobMap[resolved] || blobMap[val];
+        if(blobUrl) return `url("${blobUrl}")`;
+        return match;
+      });
+
+      // ES module import statements  import ... from '...'
+      html = html.replace(/import\s+([^'"]*from\s+)?["']([^"']+)["']/gi, (match, pre, val) => {
+        if(val.startsWith('http') || val.startsWith('//')) return match;
+        const resolved = resolveZipPath(entryDir, val);
+        const blobUrl = blobMap[resolved] || blobMap[val];
+        if(blobUrl) return `import ${pre||''}"${blobUrl}"`;
+        return match;
+      });
+
+      // Inject into iframe as blob
+      const finalBlob = new Blob([html], { type: 'text/html' });
+      const finalUrl = URL.createObjectURL(finalBlob);
+
+      // Track all blob URLs for later cleanup
+      state.zipBlobUrls = Object.values(blobMap).concat([finalUrl]);
+      state.activeURL = finalUrl;
+      state.zipEntryHTML = html; // save for openInBlank
+
+      const frame = document.getElementById('gameFrame');
+      frame.style.display = 'block';
+      frame.src = finalUrl;
+      frame.onload = () => setStatus('RUNNING');
+
+      const fileCount = Object.keys(blobMap).length;
+      showToast(`ZIP loaded — ${fileCount} files, entry: ${entryPath.split('/').pop()}`);
+
+    } catch(err) {
+      console.error(err);
+      showToast('ZIP error: ' + err.message);
+      setStatus('ERROR');
+    }
+  }
+
+  function resolveZipPath(baseDir, relativePath) {
+    // Handle ../ and ./ in paths relative to entry HTML's directory
+    const parts = (baseDir + relativePath).split('/');
+    const resolved = [];
+    for(const p of parts) {
+      if(p === '..') resolved.pop();
+      else if(p !== '.') resolved.push(p);
+    }
+    return resolved.join('/');
   }
 
   function setStatus(s) {
@@ -781,6 +931,18 @@
         w.document.close();
       };
       reader.readAsText(f);
+
+    } else if(ext === 'zip') {
+      // ZIP: use the already-rewritten HTML (blob URLs still valid)
+      if(state.zipEntryHTML) {
+        w.document.open();
+        w.document.write(state.zipEntryHTML);
+        w.document.close();
+      } else {
+        w.close();
+        showToast('Load the ZIP first!');
+        return;
+      }
 
     } else if(['html','htm','mhtml'].includes(ext)) {
       // HTML: read as text and write directly — stays as about:blank
