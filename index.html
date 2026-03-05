@@ -494,6 +494,20 @@
         <iframe id="gameFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups allow-pointer-lock allow-top-navigation"></iframe>
         <img id="imageView" alt="Game preview"/>
         <pre id="codeView"></pre>
+        <div id="batView" style="display:none;width:100%;height:440px;overflow:hidden;flex-direction:column;background:#000;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
+          <div id="batHeader" style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#0a0a1e;border-bottom:1px solid #1a1a3e;flex-shrink:0;">
+            <span style="color:var(--accent);letter-spacing:.1em;font-size:.65rem;">BATCH SIMULATOR</span>
+            <div style="display:flex;gap:8px;">
+              <button onclick="batReplay()" style="font-family:'Orbitron',sans-serif;font-size:.55rem;letter-spacing:.1em;padding:4px 12px;border:1px solid var(--accent);background:transparent;color:var(--accent);border-radius:3px;cursor:pointer;">↺ REPLAY</button>
+              <button onclick="batToggleRaw()" id="batRawBtn" style="font-family:'Orbitron',sans-serif;font-size:.55rem;letter-spacing:.1em;padding:4px 12px;border:1px solid var(--muted);background:transparent;color:var(--muted);border-radius:3px;cursor:pointer;">{ } RAW</button>
+            </div>
+          </div>
+          <div id="batTerminal" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:2px;"></div>
+          <div id="batRawPane" style="display:none;flex:1;overflow-y:auto;padding:14px 16px;color:#aaffaa;white-space:pre-wrap;"></div>
+          <div id="batFooter" style="padding:6px 14px;background:#0a0a1e;border-top:1px solid #1a1a3e;font-size:.6rem;color:var(--muted);flex-shrink:0;">
+            <span id="batStepInfo">—</span>
+          </div>
+        </div>
         <div id="binaryView">
           <div class="binary-icon" id="binaryIcon">📦</div>
           <div class="binary-info" id="binaryInfo"></div>
@@ -589,8 +603,8 @@
     htm: { icon:'🌐', label:'HTML GAME', viewer:'frame' },
     js: { icon:'⚡', label:'JAVASCRIPT', viewer:'code' },
     py: { icon:'🐍', label:'PYTHON', viewer:'code' },
-    bat: { icon:'💻', label:'BATCH SCRIPT', viewer:'code' },
-    sh: { icon:'💻', label:'SHELL SCRIPT', viewer:'code' },
+    bat: { icon:'💻', label:'BATCH SCRIPT', viewer:'bat' },
+    sh: { icon:'💻', label:'SHELL SCRIPT', viewer:'bat' },
     txt: { icon:'📄', label:'TEXT FILE', viewer:'code' },
     json: { icon:'📋', label:'JSON DATA', viewer:'code' },
     xml: { icon:'📋', label:'XML FILE', viewer:'code' },
@@ -712,6 +726,7 @@
     document.getElementById('gameFrame').style.display = 'none';
     document.getElementById('imageView').style.display = 'none';
     document.getElementById('codeView').style.display = 'none';
+    document.getElementById('batView').style.display = 'none';
     document.getElementById('binaryView').style.display = 'none';
     document.getElementById('viewerName').textContent = 'No file loaded';
     document.getElementById('viewerBadge').textContent = 'STANDBY';
@@ -742,6 +757,7 @@
     document.getElementById('gameFrame').style.display = 'none';
     document.getElementById('imageView').style.display = 'none';
     document.getElementById('codeView').style.display = 'none';
+    document.getElementById('batView').style.display = 'none';
     document.getElementById('binaryView').style.display = 'none';
 
     if(state.activeURL) URL.revokeObjectURL(state.activeURL);
@@ -769,6 +785,19 @@
         pre.textContent = e.target.result;
         pre.style.display = 'block';
         setStatus('PARSED');
+      };
+      reader.readAsText(f);
+    } else if(t.viewer === 'bat') {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const bv = document.getElementById('batView');
+        bv.style.display = 'flex';
+        document.getElementById('batRawPane').textContent = e.target.result;
+        document.getElementById('batRawPane').style.display = 'none';
+        document.getElementById('batTerminal').style.display = 'flex';
+        document.getElementById('batRawBtn').dataset.raw = '0';
+        runBatSimulator(e.target.result, f.name);
+        setStatus('SIMULATING');
       };
       reader.readAsText(f);
     } else if(t.viewer === 'zip') {
@@ -1258,6 +1287,385 @@ window.addEventListener('load', () => {
     }
     return resolved.join('/');
   }
+
+  // ── BAT / SH SIMULATOR ───────────────────────────────────────────────────
+
+  let batSimTimer = null;
+
+  function batReplay() {
+    const raw = document.getElementById('batRawPane').textContent;
+    const fname = document.getElementById('viewerName').textContent;
+    document.getElementById('batTerminal').innerHTML = '';
+    runBatSimulator(raw, fname);
+  }
+
+  function batToggleRaw() {
+    const btn = document.getElementById('batRawBtn');
+    const raw = document.getElementById('batRawPane');
+    const term = document.getElementById('batTerminal');
+    const isRaw = btn.dataset.raw === '1';
+    btn.dataset.raw = isRaw ? '0' : '1';
+    btn.style.color = isRaw ? 'var(--muted)' : 'var(--accent)';
+    btn.style.borderColor = isRaw ? 'var(--muted)' : 'var(--accent)';
+    raw.style.display = isRaw ? 'none' : 'block';
+    term.style.display = isRaw ? 'flex' : 'none';
+  }
+
+  function runBatSimulator(script, filename) {
+    if(batSimTimer) { clearTimeout(batSimTimer); batSimTimer = null; }
+    const term = document.getElementById('batTerminal');
+    term.innerHTML = '';
+
+    const isShell = filename.toLowerCase().endsWith('.sh');
+    const lines = script.split(/\r?\n/);
+    const steps = parseBatScript(lines, isShell);
+
+    // Print header
+    appendBatLine(term, 'prompt', `${isShell ? 'SHELL' : 'BATCH'} SCRIPT SIMULATOR — ${filename}`, 'header');
+    appendBatLine(term, 'prompt', `${steps.length} command(s) detected`, 'subheader');
+    appendBatLine(term, 'divider', '─'.repeat(52), 'divider');
+
+    document.getElementById('batStepInfo').textContent = `${steps.length} steps · simulated execution`;
+
+    let delay = 300;
+    steps.forEach((step, idx) => {
+      batSimTimer = setTimeout(() => {
+        renderBatStep(term, step, idx + 1, steps.length);
+        term.scrollTop = term.scrollHeight;
+        if(idx === steps.length - 1) {
+          setTimeout(() => {
+            appendBatLine(term, 'done', '✓ Script finished', 'done');
+            term.scrollTop = term.scrollHeight;
+            setStatus('SIMULATED');
+          }, 400);
+        }
+      }, delay);
+      delay += 180 + Math.min(step.explanation.length * 4, 300);
+    });
+  }
+
+  function parseBatScript(lines, isShell) {
+    const steps = [];
+    const vars = {};
+
+    for(let raw of lines) {
+      const line = raw.trim();
+      if(!line) continue;
+
+      // Comments
+      if(line.startsWith('::') || line.startsWith('rem ') || line.toLowerCase().startsWith('rem\t') || line === 'rem') {
+        const comment = line.replace(/^::|^rem\s*/i, '').trim();
+        steps.push({ type:'comment', raw: line, command: line, explanation: comment || '(comment)', icon:'💬' });
+        continue;
+      }
+      if(isShell && line.startsWith('#')) {
+        steps.push({ type:'comment', raw: line, command: line, explanation: line.slice(1).trim() || '(comment)', icon:'💬' });
+        continue;
+      }
+
+      // Strip leading @ (echo off prefix)
+      const noAt = line.replace(/^@/, '');
+      const lower = noAt.toLowerCase();
+      const parts = noAt.split(/\s+/);
+      const cmd = parts[0].toLowerCase();
+
+      // Echo off/on
+      if(lower === 'echo off' || lower === '@echo off') {
+        steps.push({ type:'meta', raw:line, command:noAt, explanation:'Hide command echo — commands won\'t print themselves as they run', icon:'🔇' }); continue;
+      }
+      if(lower === 'echo on') {
+        steps.push({ type:'meta', raw:line, command:noAt, explanation:'Show command echo — each command prints before running', icon:'🔊' }); continue;
+      }
+
+      // Echo message
+      if(cmd === 'echo') {
+        const msg = parts.slice(1).join(' ');
+        if(msg.startsWith('.') || msg === '') {
+          steps.push({ type:'output', raw:line, command:noAt, explanation:'Print a blank line to the terminal', icon:'↵' });
+        } else {
+          steps.push({ type:'output', raw:line, command:noAt, explanation:`Print to terminal: "${expandVars(msg, vars)}"`, icon:'📢' });
+        }
+        continue;
+      }
+
+      // Pause
+      if(cmd === 'pause') {
+        steps.push({ type:'wait', raw:line, command:noAt, explanation:'Pause execution and wait for the user to press any key', icon:'⏸' }); continue;
+      }
+
+      // Exit
+      if(cmd === 'exit') {
+        const code = parts[1];
+        steps.push({ type:'exit', raw:line, command:noAt, explanation: code ? `Exit the script with code ${code}` : 'Exit the script / close the terminal window', icon:'🚪' }); continue;
+      }
+
+      // CD / chdir
+      if(cmd === 'cd' || cmd === 'chdir') {
+        const dir = parts.slice(1).join(' ');
+        steps.push({ type:'navigate', raw:line, command:noAt, explanation:`Change working directory to: ${expandVars(dir, vars)}`, icon:'📁' }); continue;
+      }
+
+      // MD / mkdir
+      if(cmd === 'md' || cmd === 'mkdir') {
+        const dir = parts.slice(1).join(' ');
+        steps.push({ type:'filesystem', raw:line, command:noAt, explanation:`Create directory: ${expandVars(dir, vars)}`, icon:'📂' }); continue;
+      }
+
+      // RD / rmdir
+      if(cmd === 'rd' || cmd === 'rmdir') {
+        const flags = parts.filter(p => p.startsWith('/')).map(p => p.toLowerCase());
+        const dir = parts.filter(p => !p.startsWith('/')).slice(1).join(' ');
+        const recursive = flags.includes('/s') ? ' (including all contents)' : '';
+        steps.push({ type:'filesystem', raw:line, command:noAt, explanation:`Delete directory: ${expandVars(dir, vars)}${recursive}`, icon:'🗑' }); continue;
+      }
+
+      // DEL / ERASE
+      if(cmd === 'del' || cmd === 'erase') {
+        const target = parts.slice(1).filter(p => !p.startsWith('/')).join(' ');
+        steps.push({ type:'filesystem', raw:line, command:noAt, explanation:`Delete file(s): ${expandVars(target, vars)}`, icon:'🗑' }); continue;
+      }
+
+      // COPY / XCOPY / ROBOCOPY
+      if(cmd === 'copy' || cmd === 'xcopy' || cmd === 'robocopy') {
+        const src  = parts[1] || '?';
+        const dest = parts[2] || '?';
+        const extra = cmd !== 'copy' ? ` (${cmd === 'xcopy' ? 'with subdirectories' : 'robust/resumable copy'})` : '';
+        steps.push({ type:'filesystem', raw:line, command:noAt, explanation:`Copy ${expandVars(src,vars)} → ${expandVars(dest,vars)}${extra}`, icon:'📋' }); continue;
+      }
+
+      // MOVE
+      if(cmd === 'move') {
+        const src  = parts[1] || '?';
+        const dest = parts[2] || '?';
+        steps.push({ type:'filesystem', raw:line, command:noAt, explanation:`Move/rename ${expandVars(src,vars)} → ${expandVars(dest,vars)}`, icon:'✂️' }); continue;
+      }
+
+      // SET
+      if(cmd === 'set') {
+        const rest = parts.slice(1).join(' ');
+        const eq = rest.indexOf('=');
+        if(eq !== -1) {
+          const vname = rest.slice(0, eq).trim();
+          const vval  = rest.slice(eq+1).trim();
+          vars[vname.toLowerCase()] = vval;
+          steps.push({ type:'variable', raw:line, command:noAt, explanation:`Set variable %${vname}% = "${vval}"`, icon:'📌' });
+        } else {
+          steps.push({ type:'variable', raw:line, command:noAt, explanation:`Display variable: ${rest}`, icon:'📌' });
+        }
+        continue;
+      }
+
+      // CALL
+      if(cmd === 'call') {
+        const target = parts.slice(1).join(' ');
+        steps.push({ type:'call', raw:line, command:noAt, explanation:`Call sub-script or label: ${expandVars(target, vars)}`, icon:'📞' }); continue;
+      }
+
+      // START
+      if(cmd === 'start') {
+        const prog = parts.slice(1).filter(p => !p.startsWith('/')).join(' ');
+        steps.push({ type:'launch', raw:line, command:noAt, explanation:`Launch program/window: ${expandVars(prog, vars)}`, icon:'🚀' }); continue;
+      }
+
+      // Python / py / python3
+      if(cmd === 'python' || cmd === 'python3' || cmd === 'py') {
+        const script = parts[1] ? expandVars(parts[1], vars) : '';
+        const args   = parts.slice(2).join(' ');
+        if(script) {
+          steps.push({ type:'run', raw:line, command:noAt, explanation:`Run Python script: ${script}${args ? ' with args: '+args : ''}`, icon:'🐍' });
+        } else {
+          steps.push({ type:'run', raw:line, command:noAt, explanation:'Open interactive Python interpreter', icon:'🐍' });
+        }
+        continue;
+      }
+
+      // Node / npm / npx
+      if(cmd === 'node') {
+        const script = parts[1] ? expandVars(parts[1], vars) : '';
+        steps.push({ type:'run', raw:line, command:noAt, explanation:`Run Node.js${script ? ': '+script : ' (interactive)'}`, icon:'💚' }); continue;
+      }
+      if(cmd === 'npm' || cmd === 'npx') {
+        steps.push({ type:'run', raw:line, command:noAt, explanation:`${cmd.toUpperCase()} ${parts.slice(1).join(' ')} — Node package manager operation`, icon:'📦' }); continue;
+      }
+
+      // pip
+      if(cmd === 'pip' || cmd === 'pip3') {
+        const sub = parts[1]?.toLowerCase();
+        const pkg = parts.slice(2).filter(p=>!p.startsWith('-')).join(', ');
+        const action = sub === 'install' ? `Install Python package(s): ${pkg}` : sub === 'uninstall' ? `Uninstall Python package(s): ${pkg}` : `pip ${parts.slice(1).join(' ')}`;
+        steps.push({ type:'install', raw:line, command:noAt, explanation:action, icon:'🐍' }); continue;
+      }
+
+      // curl / wget
+      if(cmd === 'curl' || cmd === 'wget') {
+        const url = parts.find(p => p.startsWith('http')) || parts.slice(1).join(' ');
+        steps.push({ type:'network', raw:line, command:noAt, explanation:`Download from: ${url}`, icon:'🌐' }); continue;
+      }
+
+      // git
+      if(cmd === 'git') {
+        const sub = parts[1]?.toLowerCase();
+        const gitActions = { clone:'Clone repository', pull:'Pull latest changes', push:'Push commits', commit:'Create a commit', checkout:'Switch branch/file', init:'Initialize new repository', status:'Show working tree status', add:'Stage files for commit' };
+        const action = gitActions[sub] || `git ${parts.slice(1).join(' ')}`;
+        const detail = sub === 'clone' && parts[2] ? `: ${parts[2]}` : sub === 'checkout' && parts[2] ? ` to ${parts[2]}` : '';
+        steps.push({ type:'git', raw:line, command:noAt, explanation:`${action}${detail}`, icon:'🔀' }); continue;
+      }
+
+      // IF
+      if(cmd === 'if') {
+        steps.push({ type:'condition', raw:line, command:noAt, explanation:`Conditional: if ${parts.slice(1,4).join(' ')} → run command`, icon:'🔀' }); continue;
+      }
+
+      // FOR
+      if(cmd === 'for') {
+        steps.push({ type:'loop', raw:line, command:noAt, explanation:`Loop over items: ${parts.slice(1).join(' ')}`, icon:'🔁' }); continue;
+      }
+
+      // GOTO / labels
+      if(cmd === 'goto') {
+        steps.push({ type:'jump', raw:line, command:noAt, explanation:`Jump to label :${parts[1] || '?'}`, icon:'⤵️' }); continue;
+      }
+      if(line.startsWith(':') && !line.startsWith('::')) {
+        steps.push({ type:'label', raw:line, command:line, explanation:`Define jump label: ${line}`, icon:'🏷' }); continue;
+      }
+
+      // TASKKILL
+      if(cmd === 'taskkill') {
+        const proc = parts.find(p => p.toLowerCase().startsWith('/im'))?.split(':')[1] || parts.find(p => p.toLowerCase().startsWith('/pid'))?.split(':')[1] || '?';
+        steps.push({ type:'process', raw:line, command:noAt, explanation:`Kill process: ${proc}`, icon:'⛔' }); continue;
+      }
+
+      // TIMEOUT / SLEEP
+      if(cmd === 'timeout' || cmd === 'sleep') {
+        const secs = parts[1]?.replace('/t','') || parts[2] || '?';
+        steps.push({ type:'wait', raw:line, command:noAt, explanation:`Wait ${secs} second(s) before continuing`, icon:'⏱' }); continue;
+      }
+
+      // CLS
+      if(cmd === 'cls' || cmd === 'clear') {
+        steps.push({ type:'meta', raw:line, command:noAt, explanation:'Clear the terminal screen', icon:'✨' }); continue;
+      }
+
+      // TYPE / CAT
+      if(cmd === 'type' || cmd === 'cat') {
+        const file = parts.slice(1).join(' ');
+        steps.push({ type:'output', raw:line, command:noAt, explanation:`Print contents of file: ${expandVars(file, vars)}`, icon:'📄' }); continue;
+      }
+
+      // FINDSTR / GREP
+      if(cmd === 'findstr' || cmd === 'grep') {
+        steps.push({ type:'search', raw:line, command:noAt, explanation:`Search for pattern: ${parts.slice(1).join(' ')}`, icon:'🔍' }); continue;
+      }
+
+      // Shell specific: source / export / chmod / ls / pwd
+      if(isShell) {
+        if(cmd === 'source' || cmd === '.') {
+          steps.push({ type:'call', raw:line, command:noAt, explanation:`Source script into current shell: ${parts.slice(1).join(' ')}`, icon:'📥' }); continue;
+        }
+        if(cmd === 'export') {
+          steps.push({ type:'variable', raw:line, command:noAt, explanation:`Export environment variable: ${parts.slice(1).join(' ')}`, icon:'📌' }); continue;
+        }
+        if(cmd === 'chmod') {
+          steps.push({ type:'filesystem', raw:line, command:noAt, explanation:`Change permissions: ${parts.slice(1).join(' ')}`, icon:'🔐' }); continue;
+        }
+        if(cmd === 'ls' || cmd === 'dir') {
+          steps.push({ type:'output', raw:line, command:noAt, explanation:`List files in: ${parts.slice(1).join(' ') || 'current directory'}`, icon:'📋' }); continue;
+        }
+        if(cmd === 'pwd') {
+          steps.push({ type:'output', raw:line, command:noAt, explanation:'Print current working directory path', icon:'📍' }); continue;
+        }
+      }
+
+      // Pipe / redirect
+      if(line.includes('|') || line.includes('>') || line.includes('<')) {
+        steps.push({ type:'pipe', raw:line, command:noAt, explanation:`Run with I/O redirect or pipe: ${noAt}`, icon:'⇄' }); continue;
+      }
+
+      // Generic executable / unknown
+      const ext = cmd.split('.').pop().toLowerCase();
+      if(['exe','msi','cmd','bat','ps1','vbs'].includes(ext) || cmd.includes('\\') || cmd.includes('/')) {
+        steps.push({ type:'run', raw:line, command:noAt, explanation:`Run executable: ${expandVars(noAt, vars)}`, icon:'⚙️' });
+      } else {
+        steps.push({ type:'unknown', raw:line, command:noAt, explanation:`Execute: ${expandVars(noAt, vars)}`, icon:'▶️' });
+      }
+    }
+
+    return steps;
+  }
+
+  function expandVars(str, vars) {
+    return str.replace(/%([^%]+)%/gi, (m, name) => vars[name.toLowerCase()] || m);
+  }
+
+  const batTypeColors = {
+    comment:    '#4a5080',
+    meta:       '#7b5fff',
+    output:     '#00c8ff',
+    wait:       '#ffaa00',
+    exit:       '#ff4466',
+    navigate:   '#00ff9f',
+    filesystem: '#ffcc44',
+    variable:   '#cc88ff',
+    call:       '#00f5ff',
+    launch:     '#00ff9f',
+    run:        '#88ff44',
+    install:    '#44ccff',
+    network:    '#44aaff',
+    git:        '#ff8844',
+    condition:  '#ffdd44',
+    loop:       '#ffdd44',
+    jump:       '#ff8888',
+    label:      '#888888',
+    process:    '#ff4444',
+    pipe:       '#aaaaff',
+    search:     '#44ffcc',
+    done:       '#00ff7f',
+    unknown:    '#aaaaaa',
+    header:     '#00f5ff',
+    subheader:  '#4a5080',
+    divider:    '#1a1a3e',
+  };
+
+  function renderBatStep(term, step, num, total) {
+    const color = batTypeColors[step.type] || '#aaaaaa';
+
+    // Command line
+    const cmdRow = document.createElement('div');
+    cmdRow.style.cssText = `display:flex;align-items:flex-start;gap:8px;padding:4px 0;animation:batFadeIn .25s ease;`;
+    cmdRow.innerHTML = `
+      <span style="color:#1a1a3e;font-size:.6rem;min-width:24px;text-align:right;padding-top:1px;">${num}</span>
+      <span style="color:${color};min-width:16px;">${step.icon}</span>
+      <span style="color:#555;flex:1;font-size:.75rem;">${escapeHtml(step.raw)}</span>`;
+    term.appendChild(cmdRow);
+
+    // Explanation row
+    const expRow = document.createElement('div');
+    expRow.style.cssText = `display:flex;align-items:flex-start;gap:8px;padding:2px 0 8px 0;border-bottom:1px solid #0d0d1e;`;
+    expRow.innerHTML = `
+      <span style="min-width:24px;"></span>
+      <span style="min-width:16px;"></span>
+      <span style="color:${color};font-size:.72rem;line-height:1.4;">→ ${escapeHtml(step.explanation)}</span>`;
+    term.appendChild(expRow);
+  }
+
+  function appendBatLine(term, type, text, cls) {
+    const color = batTypeColors[cls] || batTypeColors[type] || '#aaaaaa';
+    const div = document.createElement('div');
+    div.style.cssText = `padding:4px 0;color:${color};font-size:${cls==='header'?'.8rem':'.65rem'};letter-spacing:${cls==='header'?'.12em':'.05em'};`;
+    div.textContent = text;
+    term.appendChild(div);
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // Inject keyframe for bat step animation
+  (function(){
+    const style = document.createElement('style');
+    style.textContent = `@keyframes batFadeIn { from{opacity:0;transform:translateX(-6px);} to{opacity:1;transform:translateX(0);} }`;
+    document.head.appendChild(style);
+  })();
 
   function setStatus(s) {
     document.getElementById('statusText').textContent = s;
