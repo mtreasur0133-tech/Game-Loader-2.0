@@ -418,6 +418,7 @@
 <div class="orb orb1"></div>
 <div class="orb orb2"></div>
 <div class="orb orb3"></div>
+<canvas id="themeCanvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0;transition:opacity 0.8s;"></canvas>
 
 <div class="wrapper">
   <header>
@@ -1774,6 +1775,476 @@ window.addEventListener('load', () => {
     showToast('Theme applied ✓');
   }
 
+  function setTheme(theme, btn) {
+    document.body.dataset.theme = theme === 'default' ? '' : theme;
+    state.theme = theme;
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    startThemeAnimation(theme);
+    showToast('Theme applied ✓');
+  }
+
+  // ── THEME ANIMATION ENGINE ────────────────────────────────────────────────
+  let themeAnimId = null;
+
+  function startThemeAnimation(theme) {
+    const canvas = document.getElementById('themeCanvas');
+    const ctx = canvas.getContext('2d');
+    if(themeAnimId) { cancelAnimationFrame(themeAnimId); themeAnimId = null; }
+
+    // Resize canvas to fill window
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    canvas.style.opacity = '0';
+
+    // For default theme: keep orbs visible AND run cyber neon on canvas at low opacity
+    if(theme === 'default') {
+      canvas.style.opacity = '0.5';
+      document.querySelectorAll('.orb').forEach(o => o.style.display = 'block');
+      animateCyberNeon(canvas, ctx);
+      return;
+    }
+
+    document.querySelectorAll('.orb').forEach(o => o.style.display = 'none');
+    setTimeout(() => canvas.style.opacity = '1', 50);
+
+    if(theme === 'neon-pink')  animateMagma(canvas, ctx);
+    if(theme === 'forest')     animateMatrix(canvas, ctx);
+    if(theme === 'sunset')     animateEmber(canvas, ctx);
+    if(theme === 'void')       animateVoid(canvas, ctx);
+  }
+
+  // ── CYBER: Electric neon grid pulses + lightning arcs ─────────────────────
+  function animateCyberNeon(canvas, ctx) {
+    const pulses = [];
+    const arcs   = [];
+    let t = 0;
+
+    function spawnPulse() {
+      pulses.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: 0, maxR: 80 + Math.random() * 120,
+        alpha: 0.6, color: Math.random() > 0.5 ? '0,245,255' : '255,0,110'
+      });
+    }
+    function spawnArc() {
+      const x1 = Math.random() * canvas.width;
+      const y1 = Math.random() * canvas.height;
+      const segs = [];
+      let cx = x1, cy = y1;
+      for(let i = 0; i < 8 + Math.random()*6; i++) {
+        cx += (Math.random()-0.5)*120;
+        cy += (Math.random()-0.5)*80;
+        segs.push([cx, cy]);
+      }
+      arcs.push({ x1, y1, segs, life: 1, decay: 0.04 + Math.random()*0.04, color: Math.random()>0.5?'0,245,255':'123,47,255' });
+    }
+
+    for(let i=0;i<6;i++) spawnPulse();
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      t++;
+
+      // Grid lines pulse
+      ctx.strokeStyle = `rgba(0,245,255,${0.025 + 0.015*Math.sin(t*0.02)})`;
+      ctx.lineWidth = 1;
+      const gSize = 44;
+      const offX = (t * 0.3) % gSize;
+      const offY = (t * 0.3) % gSize;
+      for(let x = -gSize+offX; x < canvas.width+gSize; x+=gSize) {
+        ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke();
+      }
+      for(let y = -gSize+offY; y < canvas.height+gSize; y+=gSize) {
+        ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke();
+      }
+
+      // Radial pulses
+      for(let i = pulses.length-1; i >= 0; i--) {
+        const p = pulses[i];
+        p.r += 2.2;
+        p.alpha = 0.5 * (1 - p.r/p.maxR);
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
+        grad.addColorStop(0,   `rgba(${p.color},0)`);
+        grad.addColorStop(0.7, `rgba(${p.color},${p.alpha*0.3})`);
+        grad.addColorStop(1,   `rgba(${p.color},0)`);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        // Ring
+        ctx.strokeStyle = `rgba(${p.color},${p.alpha})`;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.stroke();
+        if(p.r >= p.maxR) { pulses.splice(i,1); spawnPulse(); }
+      }
+
+      // Lightning arcs
+      if(t % 18 === 0) spawnArc();
+      for(let i = arcs.length-1; i >= 0; i--) {
+        const a = arcs[i];
+        a.life -= a.decay;
+        if(a.life <= 0) { arcs.splice(i,1); continue; }
+        ctx.strokeStyle = `rgba(${a.color},${a.life * 0.9})`;
+        ctx.lineWidth = a.life * 2;
+        ctx.shadowBlur = 12 * a.life;
+        ctx.shadowColor = `rgba(${a.color},0.8)`;
+        ctx.beginPath();
+        ctx.moveTo(a.x1, a.y1);
+        for(const [sx,sy] of a.segs) ctx.lineTo(sx,sy);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      }
+
+      // Scanning beam
+      const scanY = (t * 1.5) % (canvas.height + 40) - 20;
+      const scanGrad = ctx.createLinearGradient(0, scanY-8, 0, scanY+8);
+      scanGrad.addColorStop(0, 'rgba(0,245,255,0)');
+      scanGrad.addColorStop(0.5, 'rgba(0,245,255,0.08)');
+      scanGrad.addColorStop(1, 'rgba(0,245,255,0)');
+      ctx.fillStyle = scanGrad;
+      ctx.fillRect(0, scanY-8, canvas.width, 16);
+
+      themeAnimId = requestAnimationFrame(draw);
+    }
+    draw();
+  }
+
+  // ── MAGMA: Molten lava flowing blobs ──────────────────────────────────────
+  function animateMagma(canvas, ctx) {
+    const blobs = [];
+    let t = 0;
+
+    for(let i=0; i<12; i++) {
+      blobs.push({
+        x: Math.random()*canvas.width,
+        y: canvas.height + Math.random()*200,
+        r: 60 + Math.random()*120,
+        vx: (Math.random()-0.5)*0.4,
+        vy: -(0.2 + Math.random()*0.5),
+        hue: 10 + Math.random()*30,  // orange-red range
+        phase: Math.random()*Math.PI*2,
+        wobble: 0.3 + Math.random()*0.5
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      t++;
+
+      // Dark base gradient
+      const bg = ctx.createLinearGradient(0, canvas.height, 0, 0);
+      bg.addColorStop(0, 'rgba(30,5,0,0.6)');
+      bg.addColorStop(0.4, 'rgba(15,3,0,0.4)');
+      bg.addColorStop(1, 'rgba(5,0,0,0.2)');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Lava cracks at bottom
+      for(let c=0; c<6; c++) {
+        const cx = (canvas.width/6)*c + (canvas.width/12);
+        const crackAlpha = 0.3 + 0.2*Math.sin(t*0.03 + c);
+        const crackGrad = ctx.createLinearGradient(cx, canvas.height, cx, canvas.height-60);
+        crackGrad.addColorStop(0, `rgba(255,120,0,${crackAlpha})`);
+        crackGrad.addColorStop(1, 'rgba(255,60,0,0)');
+        ctx.strokeStyle = crackGrad;
+        ctx.lineWidth = 2 + Math.sin(t*0.05+c)*1;
+        ctx.beginPath();
+        ctx.moveTo(cx, canvas.height);
+        for(let seg=0; seg<5; seg++) {
+          ctx.lineTo(cx + (Math.random()-0.5)*20, canvas.height - seg*12);
+        }
+        ctx.stroke();
+      }
+
+      // Lava blobs
+      for(const b of blobs) {
+        b.x += b.vx + Math.sin(t*0.008+b.phase)*0.3;
+        b.y += b.vy + Math.cos(t*0.006+b.phase)*0.15;
+        b.phase += 0.008;
+        if(b.y + b.r < -100) {
+          b.y = canvas.height + b.r + Math.random()*100;
+          b.x = Math.random()*canvas.width;
+        }
+
+        const blobAlpha = 0.06 + 0.04*Math.sin(t*0.02+b.phase);
+        const brightness = Math.min(1, (canvas.height - b.y) / canvas.height + 0.3);
+        const grad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r*(1+b.wobble*Math.sin(t*0.04+b.phase)));
+        grad.addColorStop(0,   `hsla(${b.hue+10},100%,70%,${blobAlpha*2})`);
+        grad.addColorStop(0.4, `hsla(${b.hue},100%,50%,${blobAlpha*1.5})`);
+        grad.addColorStop(1,   `hsla(${b.hue-10},100%,30%,0)`);
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r*(1+b.wobble*0.3*Math.sin(t*0.04+b.phase)), 0, Math.PI*2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+      }
+
+      // Heat shimmer lines
+      for(let h=0; h<4; h++) {
+        const hy = canvas.height - 30 - h*25;
+        const shimmerAlpha = (0.04-h*0.008) * (0.6+0.4*Math.sin(t*0.04+h));
+        ctx.fillStyle = `rgba(255,80,0,${shimmerAlpha})`;
+        ctx.fillRect(0, hy, canvas.width, 3 + Math.sin(t*0.05+h)*2);
+      }
+
+      // Ember sparks
+      if(t % 4 === 0 && Math.random() > 0.4) {
+        blobs.push({
+          x: Math.random()*canvas.width,
+          y: canvas.height,
+          r: 2 + Math.random()*5,
+          vx: (Math.random()-0.5)*1.5,
+          vy: -(1 + Math.random()*2),
+          hue: 15 + Math.random()*25,
+          phase: 0, wobble: 0,
+          spark: true
+        });
+      }
+
+      themeAnimId = requestAnimationFrame(draw);
+    }
+    draw();
+  }
+
+  // ── MATRIX: Falling katakana/digits ───────────────────────────────────────
+  function animateMatrix(canvas, ctx) {
+    const fontSize = 14;
+    const cols = Math.floor(canvas.width / fontSize);
+    const drops = Array.from({length: cols}, () => Math.random()*-50);
+    const chars = '0123456789アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+    let t = 0;
+
+    function draw() {
+      t++;
+      ctx.fillStyle = 'rgba(5,15,7,0.055)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      for(let i = 0; i < drops.length; i++) {
+        const char = chars[Math.floor(Math.random() * chars.length)];
+        const y = drops[i] * fontSize;
+
+        // Head (bright white-green)
+        if(drops[i] > 0) {
+          ctx.fillStyle = `rgba(180,255,200,0.95)`;
+          ctx.font = `${fontSize}px 'Share Tech Mono', monospace`;
+          ctx.fillText(char, i*fontSize, y);
+        }
+
+        // Body (green gradient)
+        const bodyChar = chars[Math.floor(Math.random() * chars.length)];
+        const bodyAlpha = 0.5 + 0.3*Math.sin(t*0.1+i);
+        ctx.fillStyle = `rgba(0,255,70,${bodyAlpha * 0.7})`;
+        ctx.fillText(bodyChar, i*fontSize, y - fontSize*2);
+
+        // Dim trail
+        ctx.fillStyle = `rgba(0,180,40,0.25)`;
+        ctx.fillText(chars[Math.floor(Math.random()*chars.length)], i*fontSize, y - fontSize*5);
+
+        if(y > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i] += 0.5;
+      }
+
+      // Occasional bright flash column
+      if(t % 60 === 0) {
+        const flashCol = Math.floor(Math.random()*cols);
+        ctx.fillStyle = 'rgba(0,255,100,0.15)';
+        ctx.fillRect(flashCol*fontSize, 0, fontSize, canvas.height);
+      }
+
+      themeAnimId = requestAnimationFrame(draw);
+    }
+    draw();
+  }
+
+  // ── EMBER: Flame ambient lighting + rising embers ─────────────────────────
+  function animateEmber(canvas, ctx) {
+    const particles = [];
+    let t = 0;
+
+    function spawnEmber() {
+      particles.push({
+        x: canvas.width*0.2 + Math.random()*canvas.width*0.6,
+        y: canvas.height + 10,
+        r: 1 + Math.random()*3,
+        vx: (Math.random()-0.5)*0.8,
+        vy: -(0.5 + Math.random()*1.5),
+        life: 1,
+        decay: 0.003 + Math.random()*0.006,
+        hue: 15 + Math.random()*30,
+        bright: Math.random() > 0.8
+      });
+    }
+
+    for(let i=0;i<60;i++) {
+      spawnEmber();
+      particles[particles.length-1].y = Math.random()*canvas.height;
+      particles[particles.length-1].life = Math.random();
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      t++;
+
+      // Flame glow at bottom
+      const flameHeight = canvas.height * 0.45;
+      for(let f=0; f<3; f++) {
+        const fw = canvas.width * (0.5 + f*0.15);
+        const fx = canvas.width/2 - fw/2 + Math.sin(t*0.015+f*1.2)*30;
+        const flicker = 0.06 + 0.03*Math.sin(t*0.05+f*0.7);
+        const grad = ctx.createRadialGradient(
+          canvas.width/2, canvas.height, 0,
+          canvas.width/2, canvas.height, flameHeight*(0.7+f*0.15)
+        );
+        grad.addColorStop(0,   `rgba(255,120,0,${flicker*2})`);
+        grad.addColorStop(0.3, `rgba(255,60,0,${flicker})`);
+        grad.addColorStop(0.7, `rgba(180,20,0,${flicker*0.4})`);
+        grad.addColorStop(1,   'rgba(0,0,0,0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      // Warm ambient light on sides
+      const sideAlpha = 0.04 + 0.02*Math.sin(t*0.02);
+      const leftGrad = ctx.createLinearGradient(0,0,canvas.width*0.3,0);
+      leftGrad.addColorStop(0, `rgba(255,80,0,${sideAlpha})`);
+      leftGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = leftGrad; ctx.fillRect(0,0,canvas.width*0.3,canvas.height);
+      const rightGrad = ctx.createLinearGradient(canvas.width,0,canvas.width*0.7,0);
+      rightGrad.addColorStop(0, `rgba(255,60,0,${sideAlpha})`);
+      rightGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = rightGrad; ctx.fillRect(canvas.width*0.7,0,canvas.width*0.3,canvas.height);
+
+      // Rising ember particles
+      if(t % 3 === 0) spawnEmber();
+      for(let i = particles.length-1; i>=0; i--) {
+        const p = particles[i];
+        p.x += p.vx + Math.sin(t*0.03+i*0.1)*0.3;
+        p.y += p.vy;
+        p.life -= p.decay;
+        if(p.life <= 0 || p.y < -10) { particles.splice(i,1); continue; }
+
+        const alpha = p.life * (p.bright ? 0.95 : 0.6);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI*2);
+        if(p.bright) {
+          ctx.shadowBlur = 8; ctx.shadowColor = `hsla(${p.hue},100%,70%,0.8)`;
+        }
+        const pGrad = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*p.life+1);
+        pGrad.addColorStop(0, `hsla(60,100%,90%,${alpha})`);
+        pGrad.addColorStop(0.4, `hsla(${p.hue},100%,60%,${alpha*0.7})`);
+        pGrad.addColorStop(1, `hsla(${p.hue-10},100%,40%,0)`);
+        ctx.fillStyle = pGrad;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
+      // Subtle smoke wisps at top
+      for(let s=0; s<3; s++) {
+        const sx = canvas.width*(0.25+s*0.25) + Math.sin(t*0.01+s)*40;
+        const smokeAlpha = 0.015 * Math.sin(t*0.008+s*2);
+        if(smokeAlpha > 0) {
+          const sGrad = ctx.createRadialGradient(sx,80,0,sx,80,120);
+          sGrad.addColorStop(0, `rgba(80,40,20,${smokeAlpha})`);
+          sGrad.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = sGrad;
+          ctx.fillRect(sx-120,0,240,160);
+        }
+      }
+
+      themeAnimId = requestAnimationFrame(draw);
+    }
+    draw();
+  }
+
+  // ── VOID: Slow drifting fog, gentle star field, barely-there aurora ────────
+  function animateVoid(canvas, ctx) {
+    const stars = Array.from({length:120}, () => ({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height,
+      r: 0.3 + Math.random()*1.2,
+      twinkle: Math.random()*Math.PI*2,
+      speed: 0.005 + Math.random()*0.015
+    }));
+    const fogBlobs = Array.from({length:6}, (_, i) => ({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height,
+      r: 200+Math.random()*300,
+      vx: (Math.random()-0.5)*0.12,
+      vy: (Math.random()-0.5)*0.06,
+      phase: i*(Math.PI*2/6)
+    }));
+    let t = 0;
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      t++;
+
+      // Fog drifts
+      for(const b of fogBlobs) {
+        b.x += b.vx; b.y += b.vy; b.phase += 0.003;
+        if(b.x < -b.r) b.x = canvas.width+b.r;
+        if(b.x > canvas.width+b.r) b.x = -b.r;
+        if(b.y < -b.r) b.y = canvas.height+b.r;
+        if(b.y > canvas.height+b.r) b.y = -b.r;
+        const alpha = 0.018 + 0.008*Math.sin(b.phase);
+        const grad = ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);
+        grad.addColorStop(0, `rgba(80,80,180,${alpha})`);
+        grad.addColorStop(0.5, `rgba(60,60,140,${alpha*0.5})`);
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(b.x-b.r, b.y-b.r, b.r*2, b.r*2);
+      }
+
+      // Stars gently twinkle
+      for(const s of stars) {
+        s.twinkle += s.speed;
+        const alpha = 0.2 + 0.3*Math.sin(s.twinkle);
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(${160+Math.floor(40*Math.sin(s.twinkle))},160,240,${alpha})`;
+        ctx.fill();
+      }
+
+      // Barely visible aurora ribbons
+      for(let a=0; a<2; a++) {
+        const ay = canvas.height*(0.2+a*0.25);
+        const aAlpha = 0.018 + 0.010*Math.sin(t*0.004+a*2.1);
+        ctx.beginPath();
+        ctx.moveTo(0, ay);
+        for(let x=0; x<=canvas.width; x+=40) {
+          const wave = ay + Math.sin((x/canvas.width)*Math.PI*3 + t*0.006 + a) * 30;
+          ctx.lineTo(x, wave);
+        }
+        ctx.lineTo(canvas.width, ay+50); ctx.lineTo(0, ay+50); ctx.closePath();
+        const aGrad = ctx.createLinearGradient(0,ay-20,0,ay+50);
+        aGrad.addColorStop(0, `rgba(100,80,255,0)`);
+        aGrad.addColorStop(0.4, `rgba(120,100,255,${aAlpha})`);
+        aGrad.addColorStop(1, `rgba(80,60,200,0)`);
+        ctx.fillStyle = aGrad;
+        ctx.fill();
+      }
+
+      // Single drifting mote of light
+      const moteX = canvas.width*0.5 + Math.sin(t*0.004)*canvas.width*0.3;
+      const moteY = canvas.height*0.4 + Math.cos(t*0.003)*canvas.height*0.2;
+      const moteAlpha = 0.04 + 0.02*Math.sin(t*0.007);
+      const moteGrad = ctx.createRadialGradient(moteX,moteY,0,moteX,moteY,160);
+      moteGrad.addColorStop(0, `rgba(140,120,255,${moteAlpha})`);
+      moteGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = moteGrad;
+      ctx.fillRect(moteX-160, moteY-160, 320, 320);
+
+      themeAnimId = requestAnimationFrame(draw);
+    }
+    draw();
+  }
+
   function applyScale(v) {
     document.getElementById('scaleVal').textContent = v+'%';
     document.getElementById('gameFrame').style.transform = `scale(${v/100})`;
@@ -1785,9 +2256,21 @@ window.addEventListener('load', () => {
   function toggleAnim(btn) {
     btn.classList.toggle('on');
     const isOn = btn.classList.contains('on');
-    document.querySelectorAll('.orb').forEach(o => o.style.display = isOn ? 'block' : 'none');
-    document.body.style.setProperty('--grid', isOn ? 'rgba(0,245,255,0.04)' : 'transparent');
+    const canvas = document.getElementById('themeCanvas');
+    if(isOn) {
+      canvas.style.opacity = state.theme === 'default' ? '0' : '1';
+      document.querySelectorAll('.orb').forEach(o => o.style.display = state.theme === 'default' ? 'block' : 'none');
+      startThemeAnimation(state.theme);
+    } else {
+      if(themeAnimId) { cancelAnimationFrame(themeAnimId); themeAnimId = null; }
+      canvas.style.opacity = '0';
+      document.querySelectorAll('.orb').forEach(o => o.style.display = 'none');
+      document.body.style.setProperty('--grid', 'transparent');
+    }
   }
+
+  // Start default Cyber animation on load
+  startThemeAnimation('default');
 
   function toggleScan(btn) {
     btn.classList.toggle('on');
