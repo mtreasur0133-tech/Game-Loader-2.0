@@ -459,20 +459,38 @@
           <div class="file-types">
             <span class="file-tag">.html</span>
             <span class="file-tag">.mhtml</span>
+            <span class="file-tag">.zip</span>
+            <span class="file-tag">.tar.gz</span>
+            <span class="file-tag">.png</span>
+            <span class="file-tag">.jpg</span>
+            <span class="file-tag">.gif</span>
+            <span class="file-tag">.svg</span>
+            <span class="file-tag">.tiff</span>
+            <span class="file-tag">.psd</span>
+            <span class="file-tag">.raw</span>
+            <span class="file-tag">.mp4</span>
+            <span class="file-tag">.mkv</span>
+            <span class="file-tag">.mov</span>
+            <span class="file-tag">.avi</span>
+            <span class="file-tag">.webm</span>
+            <span class="file-tag">.mp3</span>
+            <span class="file-tag">.wav</span>
+            <span class="file-tag">.flac</span>
+            <span class="file-tag">.aac</span>
+            <span class="file-tag">.m4a</span>
+            <span class="file-tag">.pdf</span>
+            <span class="file-tag">.docx</span>
+            <span class="file-tag">.xlsx</span>
+            <span class="file-tag">.pptx</span>
+            <span class="file-tag">.csv</span>
             <span class="file-tag">.js</span>
             <span class="file-tag">.py</span>
             <span class="file-tag">.bat</span>
-            <span class="file-tag">.zip</span>
-            <span class="file-tag">.tar</span>
-            <span class="file-tag">.tar.gz</span>
-            <span class="file-tag">.tgz</span>
-            <span class="file-tag">.gz</span>
-            <span class="file-tag">.png</span>
-            <span class="file-tag">.jpeg</span>
-            <span class="file-tag">.gif</span>
-            <span class="file-tag">.mp4</span>
+            <span class="file-tag">.sql</span>
+            <span class="file-tag">.ttf</span>
             <span class="file-tag">.json</span>
             <span class="file-tag">.txt</span>
+            <span class="file-tag">+ more</span>
           </div>
         </div>
         <input type="file" id="fileInput" multiple accept="*/*"/>
@@ -532,6 +550,7 @@
           <div class="binary-info" id="binaryInfo"></div>
           <button class="open-blank-btn" onclick="openInBlank()">🚀 OPEN IN NEW TAB</button>
         </div>
+        <div id="mediaView" style="display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:16px;background:#000;gap:8px;"></div>
       </div>
 
       <div class="status-bar">
@@ -617,37 +636,124 @@
   };
 
   const typeMap = {
-    html: { icon:'🌐', label:'HTML GAME', viewer:'frame' },
-    mhtml: { icon:'🌐', label:'MHTML GAME', viewer:'mhtml' },
-    mht: { icon:'🌐', label:'MHT PAGE', viewer:'mhtml' },
-    htm: { icon:'🌐', label:'HTML GAME', viewer:'frame' },
-    js: { icon:'⚡', label:'JAVASCRIPT', viewer:'code' },
-    py: { icon:'🐍', label:'PYTHON', viewer:'code' },
-    bat: { icon:'💻', label:'BATCH SCRIPT', viewer:'bat' },
-    sh: { icon:'💻', label:'SHELL SCRIPT', viewer:'bat' },
-    txt: { icon:'📄', label:'TEXT FILE', viewer:'code' },
-    json: { icon:'📋', label:'JSON DATA', viewer:'code' },
-    xml: { icon:'📋', label:'XML FILE', viewer:'code' },
-    css: { icon:'🎨', label:'CSS FILE', viewer:'code' },
-    png: { icon:'🖼', label:'PNG IMAGE', viewer:'image' },
-    jpeg: { icon:'🖼', label:'JPEG IMAGE', viewer:'image' },
-    jpg: { icon:'🖼', label:'JPEG IMAGE', viewer:'image' },
-    gif: { icon:'🖼', label:'GIF IMAGE', viewer:'image' },
-    webp: { icon:'🖼', label:'WEBP IMAGE', viewer:'image' },
-    svg: { icon:'🖼', label:'SVG IMAGE', viewer:'image' },
-    bmp: { icon:'🖼', label:'BMP IMAGE', viewer:'image' },
-    mp4: { icon:'🎬', label:'VIDEO FILE', viewer:'binary' },
-    mp3: { icon:'🎵', label:'AUDIO FILE', viewer:'binary' },
-    wav: { icon:'🎵', label:'AUDIO FILE', viewer:'binary' },
-    zip: { icon:'📦', label:'ZIP GAME', viewer:'zip' },
-    rar: { icon:'📦', label:'RAR ARCHIVE', viewer:'binary' },
-    tar: { icon:'📦', label:'TAR ARCHIVE', viewer:'zip' },
-    gz:  { icon:'📦', label:'GZ ARCHIVE',  viewer:'zip' },
-    tgz: { icon:'📦', label:'TGZ GAME',    viewer:'zip' },
-    bz2: { icon:'📦', label:'BZ2 ARCHIVE', viewer:'binary' },
-    '7z':{ icon:'📦', label:'7Z ARCHIVE',  viewer:'binary' },
-    exe: { icon:'⚙', label:'EXECUTABLE', viewer:'binary' },
-    pdf: { icon:'📑', label:'PDF DOCUMENT', viewer:'frame' },
+    // ── Web / Markup ──────────────────────────────────────────────
+    html: { icon:'🌐', label:'HTML GAME',    viewer:'frame' },
+    mhtml:{ icon:'🌐', label:'MHTML GAME',   viewer:'mhtml' },
+    mht:  { icon:'🌐', label:'MHT PAGE',     viewer:'mhtml' },
+    htm:  { icon:'🌐', label:'HTML GAME',    viewer:'frame' },
+    php:  { icon:'🐘', label:'PHP FILE',     viewer:'code'  },
+    css:  { icon:'🎨', label:'CSS FILE',     viewer:'code'  },
+    // ── Code / Scripts ────────────────────────────────────────────
+    js:   { icon:'⚡', label:'JAVASCRIPT',   viewer:'code' },
+    mjs:  { icon:'⚡', label:'JS MODULE',    viewer:'code' },
+    ts:   { icon:'⚡', label:'TYPESCRIPT',   viewer:'code' },
+    py:   { icon:'🐍', label:'PYTHON',       viewer:'code' },
+    bat:  { icon:'💻', label:'BATCH SCRIPT', viewer:'bat'  },
+    cmd:  { icon:'💻', label:'CMD SCRIPT',   viewer:'bat'  },
+    sh:   { icon:'💻', label:'SHELL SCRIPT', viewer:'bat'  },
+    ps1:  { icon:'💻', label:'POWERSHELL',   viewer:'bat'  },
+    rb:   { icon:'💎', label:'RUBY',         viewer:'code' },
+    java: { icon:'☕', label:'JAVA',         viewer:'code' },
+    cpp:  { icon:'⚙', label:'C++',          viewer:'code' },
+    c:    { icon:'⚙', label:'C FILE',       viewer:'code' },
+    cs:   { icon:'⚙', label:'C# FILE',      viewer:'code' },
+    go:   { icon:'🐹', label:'GO FILE',      viewer:'code' },
+    rs:   { icon:'🦀', label:'RUST FILE',    viewer:'code' },
+    lua:  { icon:'🌙', label:'LUA SCRIPT',   viewer:'code' },
+    // ── Documents ─────────────────────────────────────────────────
+    pdf:  { icon:'📑', label:'PDF DOCUMENT',  viewer:'frame'  },
+    txt:  { icon:'📄', label:'TEXT FILE',     viewer:'code'   },
+    md:   { icon:'📝', label:'MARKDOWN',      viewer:'code'   },
+    rtf:  { icon:'📄', label:'RTF DOCUMENT',  viewer:'binary' },
+    doc:  { icon:'📘', label:'WORD DOC',      viewer:'binary' },
+    docx: { icon:'📘', label:'WORD DOCUMENT', viewer:'binary' },
+    odt:  { icon:'📄', label:'ODT DOCUMENT',  viewer:'binary' },
+    pages:{ icon:'📄', label:'PAGES DOC',     viewer:'binary' },
+    // ── Data / Config ─────────────────────────────────────────────
+    json: { icon:'📋', label:'JSON DATA',     viewer:'code' },
+    xml:  { icon:'📋', label:'XML FILE',      viewer:'code' },
+    yaml: { icon:'📋', label:'YAML FILE',     viewer:'code' },
+    yml:  { icon:'📋', label:'YAML FILE',     viewer:'code' },
+    toml: { icon:'📋', label:'TOML FILE',     viewer:'code' },
+    ini:  { icon:'📋', label:'INI CONFIG',    viewer:'code' },
+    env:  { icon:'📋', label:'ENV FILE',      viewer:'code' },
+    csv:  { icon:'📊', label:'CSV DATA',      viewer:'code' },
+    tsv:  { icon:'📊', label:'TSV DATA',      viewer:'code' },
+    // ── Spreadsheets ──────────────────────────────────────────────
+    xlsx: { icon:'📊', label:'EXCEL FILE',    viewer:'binary' },
+    xls:  { icon:'📊', label:'EXCEL FILE',    viewer:'binary' },
+    ods:  { icon:'📊', label:'ODS SHEET',     viewer:'binary' },
+    // ── Presentations ─────────────────────────────────────────────
+    pptx: { icon:'📽', label:'POWERPOINT',    viewer:'binary' },
+    ppt:  { icon:'📽', label:'POWERPOINT',    viewer:'binary' },
+    odp:  { icon:'📽', label:'ODP SLIDES',    viewer:'binary' },
+    // ── Images ────────────────────────────────────────────────────
+    png:  { icon:'🖼', label:'PNG IMAGE',     viewer:'image' },
+    jpeg: { icon:'🖼', label:'JPEG IMAGE',    viewer:'image' },
+    jpg:  { icon:'🖼', label:'JPEG IMAGE',    viewer:'image' },
+    gif:  { icon:'🖼', label:'GIF IMAGE',     viewer:'image' },
+    webp: { icon:'🖼', label:'WEBP IMAGE',    viewer:'image' },
+    svg:  { icon:'🖼', label:'SVG IMAGE',     viewer:'image' },
+    bmp:  { icon:'🖼', label:'BMP IMAGE',     viewer:'image' },
+    tiff: { icon:'🖼', label:'TIFF IMAGE',    viewer:'image' },
+    tif:  { icon:'🖼', label:'TIFF IMAGE',    viewer:'image' },
+    ico:  { icon:'🖼', label:'ICON FILE',     viewer:'image' },
+    avif: { icon:'🖼', label:'AVIF IMAGE',    viewer:'image' },
+    // ── Raw / Pro Images ──────────────────────────────────────────
+    psd:  { icon:'🎨', label:'PHOTOSHOP',     viewer:'binary' },
+    ai:   { icon:'🎨', label:'ILLUSTRATOR',   viewer:'binary' },
+    eps:  { icon:'🎨', label:'EPS VECTOR',    viewer:'binary' },
+    raw:  { icon:'📷', label:'RAW IMAGE',     viewer:'binary' },
+    cr2:  { icon:'📷', label:'CANON RAW',     viewer:'binary' },
+    nef:  { icon:'📷', label:'NIKON RAW',     viewer:'binary' },
+    dng:  { icon:'📷', label:'DNG RAW',       viewer:'binary' },
+    // ── Video ─────────────────────────────────────────────────────
+    mp4:  { icon:'🎬', label:'MP4 VIDEO',     viewer:'media' },
+    avi:  { icon:'🎬', label:'AVI VIDEO',     viewer:'media' },
+    mov:  { icon:'🎬', label:'MOV VIDEO',     viewer:'media' },
+    wmv:  { icon:'🎬', label:'WMV VIDEO',     viewer:'binary' },
+    mkv:  { icon:'🎬', label:'MKV VIDEO',     viewer:'media' },
+    flv:  { icon:'🎬', label:'FLV VIDEO',     viewer:'binary' },
+    '3gp':{ icon:'🎬', label:'3GP VIDEO',     viewer:'media' },
+    webm: { icon:'🎬', label:'WEBM VIDEO',    viewer:'media' },
+    // ── Audio ─────────────────────────────────────────────────────
+    mp3:  { icon:'🎵', label:'MP3 AUDIO',     viewer:'media' },
+    wav:  { icon:'🎵', label:'WAV AUDIO',     viewer:'media' },
+    ogg:  { icon:'🎵', label:'OGG AUDIO',     viewer:'media' },
+    aac:  { icon:'🎵', label:'AAC AUDIO',     viewer:'media' },
+    flac: { icon:'🎵', label:'FLAC AUDIO',    viewer:'media' },
+    m4a:  { icon:'🎵', label:'M4A AUDIO',     viewer:'media' },
+    wma:  { icon:'🎵', label:'WMA AUDIO',     viewer:'binary' },
+    aiff: { icon:'🎵', label:'AIFF AUDIO',    viewer:'media' },
+    // ── Archives ──────────────────────────────────────────────────
+    zip:  { icon:'📦', label:'ZIP GAME',      viewer:'zip'    },
+    tar:  { icon:'📦', label:'TAR ARCHIVE',   viewer:'zip'    },
+    gz:   { icon:'📦', label:'GZ ARCHIVE',    viewer:'zip'    },
+    tgz:  { icon:'📦', label:'TGZ GAME',      viewer:'zip'    },
+    rar:  { icon:'📦', label:'RAR ARCHIVE',   viewer:'binary' },
+    bz2:  { icon:'📦', label:'BZ2 ARCHIVE',   viewer:'binary' },
+    '7z': { icon:'📦', label:'7Z ARCHIVE',    viewer:'binary' },
+    xz:   { icon:'📦', label:'XZ ARCHIVE',    viewer:'binary' },
+    // ── Executables ───────────────────────────────────────────────
+    exe:  { icon:'⚙', label:'EXECUTABLE',    viewer:'binary' },
+    msi:  { icon:'⚙', label:'INSTALLER',     viewer:'binary' },
+    app:  { icon:'⚙', label:'APP BUNDLE',    viewer:'binary' },
+    jar:  { icon:'☕', label:'JAVA JAR',      viewer:'binary' },
+    apk:  { icon:'📱', label:'ANDROID APK',  viewer:'binary' },
+    // ── Fonts ─────────────────────────────────────────────────────
+    ttf:  { icon:'🔤', label:'TTF FONT',      viewer:'binary' },
+    otf:  { icon:'🔤', label:'OTF FONT',      viewer:'binary' },
+    woff: { icon:'🔤', label:'WOFF FONT',     viewer:'binary' },
+    woff2:{ icon:'🔤', label:'WOFF2 FONT',    viewer:'binary' },
+    // ── System ────────────────────────────────────────────────────
+    dll:  { icon:'🔧', label:'DLL LIBRARY',   viewer:'binary' },
+    sys:  { icon:'🔧', label:'SYSTEM FILE',   viewer:'binary' },
+    // ── Database ──────────────────────────────────────────────────
+    sql:  { icon:'🗄', label:'SQL FILE',      viewer:'code'   },
+    db:   { icon:'🗄', label:'DATABASE',      viewer:'binary' },
+    mdb:  { icon:'🗄', label:'ACCESS DB',     viewer:'binary' },
+    sav:  { icon:'🗄', label:'SAVE FILE',     viewer:'binary' },
+    sqlite:{ icon:'🗄', label:'SQLITE DB',    viewer:'binary' },
   };
 
   const ARCHIVE_EXTS = new Set(['zip','tar','gz','tgz']);
@@ -971,6 +1077,7 @@
     document.getElementById('batView').style.display = 'none';
     document.getElementById('binaryView').style.display = 'none';
     document.getElementById('mhtmlLoading').style.display = 'none';
+    document.getElementById('mediaView').style.display = 'none';
   }
 
   function resetViewer() {
@@ -1051,6 +1158,33 @@
       reader.readAsText(f);
     } else if(t.viewer === 'zip') {
       loadArchive(f);
+    } else if(t.viewer === 'media') {
+      const url = URL.createObjectURL(f);
+      state.activeURL = url;
+      const mv = document.getElementById('mediaView');
+      mv.innerHTML = '';
+      const ext = f.name.split('.').pop().toLowerCase();
+      const isVideo = ['mp4','webm','mov','avi','mkv','3gp'].includes(ext);
+      const el = document.createElement(isVideo ? 'video' : 'audio');
+      el.src = url;
+      el.controls = true;
+      el.autoplay = false;
+      if(isVideo) {
+        el.style.cssText = 'max-width:100%;max-height:100%;border-radius:4px;';
+      } else {
+        el.style.cssText = 'width:90%;margin-top:20px;';
+        const cover = document.createElement('div');
+        cover.style.cssText = 'font-size:4rem;margin-bottom:16px;';
+        cover.textContent = '🎵';
+        const lbl = document.createElement('div');
+        lbl.style.cssText = 'font-family:"Share Tech Mono",monospace;font-size:.8rem;color:var(--accent);margin-bottom:16px;letter-spacing:.1em;';
+        lbl.textContent = f.name;
+        mv.appendChild(cover);
+        mv.appendChild(lbl);
+      }
+      mv.appendChild(el);
+      mv.style.display = 'flex';
+      el.onloadedmetadata = () => setStatus('PLAYING');
     } else {
       const bv = document.getElementById('binaryView');
       bv.style.display = 'flex';
@@ -1121,15 +1255,32 @@
   function getMime(filename) {
     const ext = filename.split('.').pop().toLowerCase();
     const mimes = {
-      html:'text/html', htm:'text/html', css:'text/css',
-      js:'application/javascript', mjs:'application/javascript',
+      // Web
+      html:'text/html', htm:'text/html', css:'text/css', php:'text/plain',
+      js:'application/javascript', mjs:'application/javascript', ts:'text/plain',
       json:'application/json', xml:'application/xml', svg:'image/svg+xml',
+      yaml:'text/plain', yml:'text/plain', toml:'text/plain', ini:'text/plain',
+      // Images
       png:'image/png', jpg:'image/jpeg', jpeg:'image/jpeg',
       gif:'image/gif', webp:'image/webp', bmp:'image/bmp', ico:'image/x-icon',
+      tiff:'image/tiff', tif:'image/tiff', avif:'image/avif',
+      // Audio
       mp3:'audio/mpeg', ogg:'audio/ogg', wav:'audio/wav',
-      mp4:'video/mp4', webm:'video/webm',
+      aac:'audio/aac', flac:'audio/flac', m4a:'audio/mp4', aiff:'audio/aiff',
+      // Video
+      mp4:'video/mp4', webm:'video/webm', mov:'video/quicktime',
+      avi:'video/x-msvideo', mkv:'video/x-matroska', '3gp':'video/3gpp',
+      // Fonts
       woff:'font/woff', woff2:'font/woff2', ttf:'font/ttf', otf:'font/otf',
-      txt:'text/plain', md:'text/plain',
+      // Documents / Data
+      txt:'text/plain', md:'text/plain', csv:'text/csv', tsv:'text/tab-separated-values',
+      // Binary blobs (browser won't try to render inline)
+      pdf:'application/pdf',
+      docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      pptx:'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      doc:'application/msword', xls:'application/vnd.ms-excel', ppt:'application/vnd.ms-powerpoint',
+      zip:'application/zip', gz:'application/gzip', tar:'application/x-tar',
     };
     return mimes[ext] || 'application/octet-stream';
   }
@@ -1735,7 +1886,7 @@ window.addEventListener('load', () => {
           showToast('MHTML error: ' + err.message.slice(0,40));
         });
       }
-    } else if(['png','jpg','jpeg','gif','webp','bmp'].includes(ext)) {
+    } else if(['png','jpg','jpeg','gif','webp','bmp','tiff','tif','ico','avif'].includes(ext)) {
       // Images: read as base64 and embed directly
       const reader = new FileReader();
       reader.onload = e => {
@@ -1752,6 +1903,18 @@ window.addEventListener('load', () => {
         w.document.close();
       };
       reader.readAsText(f);
+    } else if(t.viewer === 'media') {
+      // Audio / Video: native HTML5 player in new tab
+      const blobUrl = URL.createObjectURL(f);
+      const isVideo = ['mp4','webm','mov','avi','mkv','3gp'].includes(ext);
+      const tag = isVideo ? 'video' : 'audio';
+      const bodyStyle = isVideo
+        ? 'margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;'
+        : 'margin:0;background:#05050f;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px;font-family:monospace;color:#e0e8ff;';
+      const extra = isVideo ? 'style="max-width:100%;max-height:100vh;"' : 'style="width:min(500px,90vw);"';
+      w.document.open();
+      w.document.write(`<!DOCTYPE html><html><head><title>${f.name}</title></head><body style="${bodyStyle}">${isVideo?'':'<div style="font-size:4rem;">🎵</div><div style="color:#00f5ff;letter-spacing:.1em;">${f.name}</div>'}<${tag} src="${blobUrl}" controls autoplay ${extra}></${tag}></body></html>`);
+      w.document.close();
     } else if(t.viewer === 'zip') {
       // Archive (zip/tar/tgz/gz): use already-rewritten HTML
       if(state.zipEntryHTML) {
