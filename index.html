@@ -91,16 +91,16 @@
     66% { transform: translate(-20px,15px) scale(0.95); }
   }
 
-  .wrapper { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 20px; }
+  .wrapper { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 10px 16px; }
 
   /* Header */
   header {
-    text-align: center; padding: 30px 20px 20px;
+    text-align: center; padding: 12px 20px 8px;
     position: relative;
   }
   .logo {
     font-family: 'Orbitron', sans-serif;
-    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-size: clamp(1.4rem, 3.5vw, 2.2rem);
     font-weight: 900;
     letter-spacing: 0.15em;
     color: var(--accent);
@@ -114,21 +114,21 @@
   .logo span { color: var(--accent2); }
   .tagline {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.75rem; letter-spacing: 0.3em;
-    color: var(--muted); margin-top: 6px;
+    font-size: 0.6rem; letter-spacing: 0.3em;
+    color: var(--muted); margin-top: 3px;
     animation: blink 2s step-end infinite;
   }
   @keyframes blink { 50% { opacity: 0.4; } }
 
   /* Toolbar */
   .toolbar {
-    display: flex; align-items: center; gap: 10px;
-    justify-content: flex-end; margin-bottom: 16px; flex-wrap: wrap;
+    display: flex; align-items: center; gap: 8px;
+    justify-content: flex-end; margin-bottom: 8px; flex-wrap: wrap;
   }
   .btn {
     font-family: 'Orbitron', sans-serif;
-    font-size: 0.65rem; letter-spacing: 0.12em;
-    padding: 8px 16px; border-radius: 4px;
+    font-size: 0.58rem; letter-spacing: 0.1em;
+    padding: 6px 12px; border-radius: 4px;
     border: 1px solid var(--accent);
     background: transparent; color: var(--accent);
     cursor: pointer; transition: all 0.2s;
@@ -147,7 +147,7 @@
 
   /* Main panels */
   .main-grid {
-    display: grid; grid-template-columns: 320px 1fr; gap: 16px;
+    display: grid; grid-template-columns: 268px 1fr; gap: 10px;
     align-items: start;
   }
   @media(max-width:750px) { .main-grid { grid-template-columns: 1fr; } }
@@ -155,7 +155,7 @@
   .panel {
     background: var(--panel);
     border: 1px solid var(--border);
-    border-radius: 8px; padding: 20px;
+    border-radius: 6px; padding: 12px 14px;
     position: relative; overflow: hidden;
   }
   .panel::before {
@@ -168,8 +168,8 @@
   }
   .panel-title {
     font-family: 'Orbitron', sans-serif;
-    font-size: 0.7rem; letter-spacing: 0.2em;
-    color: var(--accent); margin-bottom: 16px;
+    font-size: 0.62rem; letter-spacing: 0.2em;
+    color: var(--accent); margin-bottom: 10px;
     display: flex; align-items: center; gap: 8px;
   }
   .panel-title::after {
@@ -179,8 +179,8 @@
 
   /* Drop zone */
   .drop-zone {
-    border: 2px dashed var(--border); border-radius: 8px;
-    padding: 36px 20px; text-align: center;
+    border: 2px dashed var(--border); border-radius: 6px;
+    padding: 14px 12px; text-align: center;
     cursor: pointer; transition: all 0.3s; position: relative;
     background: rgba(0,245,255,0.01);
   }
@@ -193,21 +193,21 @@
   @keyframes pulse { from { box-shadow: inset 0 0 20px rgba(0,245,255,0.05); } to { box-shadow: inset 0 0 40px rgba(0,245,255,0.15); } }
 
   .drop-icon {
-    font-size: 3rem; display: block; margin-bottom: 12px;
+    font-size: 1.8rem; display: block; margin-bottom: 6px;
     animation: floatIcon 2s ease-in-out infinite;
   }
-  @keyframes floatIcon { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+  @keyframes floatIcon { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-5px);} }
   .drop-text {
-    font-family: 'Orbitron', sans-serif; font-size: 0.7rem;
-    letter-spacing: 0.15em; color: var(--accent); margin-bottom: 6px;
+    font-family: 'Orbitron', sans-serif; font-size: 0.62rem;
+    letter-spacing: 0.15em; color: var(--accent); margin-bottom: 3px;
   }
-  .drop-sub { font-size: 0.72rem; color: var(--muted); line-height: 1.6; }
+  .drop-sub { font-size: 0.65rem; color: var(--muted); line-height: 1.4; }
   .file-types {
-    display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-top: 12px;
+    display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; margin-top: 8px;
   }
   .file-tag {
-    font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
-    padding: 2px 8px; border-radius: 20px;
+    font-family: 'Share Tech Mono', monospace; font-size: 0.55rem;
+    padding: 1px 6px; border-radius: 20px;
     border: 1px solid var(--border); color: var(--muted);
     transition: all 0.2s;
   }
@@ -216,10 +216,10 @@
   #fileInput { display: none; }
 
   /* File list */
-  .file-list { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+  .file-list { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
   .file-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 8px 12px; border-radius: 6px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 8px; border-radius: 4px;
     background: rgba(255,255,255,0.02); border: 1px solid var(--border);
     cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
   }
@@ -230,67 +230,67 @@
     background: var(--accent); opacity: 0; transition: opacity 0.2s;
   }
   .file-item:hover::before, .file-item.active::before { opacity: 1; }
-  .file-icon { font-size: 1.1rem; flex-shrink: 0; }
-  .file-name { font-size: 0.75rem; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .file-size { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: var(--muted); flex-shrink: 0; }
-  .file-remove { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.8rem; padding: 2px 6px; border-radius: 3px; transition: all 0.2s; }
+  .file-icon { font-size: 0.9rem; flex-shrink: 0; }
+  .file-name { font-size: 0.68rem; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file-size { font-family: 'Share Tech Mono', monospace; font-size: 0.55rem; color: var(--muted); flex-shrink: 0; }
+  .file-remove { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.75rem; padding: 1px 4px; border-radius: 3px; transition: all 0.2s; }
   .file-remove:hover { color: var(--accent2); }
 
   /* Viewer */
-  .viewer-panel { min-height: 500px; display: flex; flex-direction: column; }
+  .viewer-panel { display: flex; flex-direction: column; }
   .viewer-header {
-    display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;
+    display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;
   }
   .viewer-name {
-    font-family: 'Share Tech Mono', monospace; font-size: 0.8rem;
+    font-family: 'Share Tech Mono', monospace; font-size: 0.72rem;
     color: var(--accent); flex: 1;
   }
   .viewer-badge {
-    font-family: 'Orbitron', sans-serif; font-size: 0.55rem; letter-spacing: 0.15em;
-    padding: 3px 10px; border-radius: 20px;
+    font-family: 'Orbitron', sans-serif; font-size: 0.5rem; letter-spacing: 0.15em;
+    padding: 2px 8px; border-radius: 20px;
     border: 1px solid var(--accent3); color: var(--accent3);
     text-transform: uppercase;
   }
   .viewer-content {
-    flex: 1; border-radius: 6px; overflow: hidden;
-    background: #000; min-height: 440px;
+    flex: 1; border-radius: 4px; overflow: hidden;
+    background: #000; height: calc(100vh - 210px); min-height: 340px; max-height: 600px;
     display: flex; align-items: center; justify-content: center;
     position: relative; border: 1px solid var(--border);
   }
 
   .placeholder {
-    text-align: center; padding: 40px;
+    text-align: center; padding: 24px;
   }
-  .placeholder-icon { font-size: 4rem; opacity: 0.2; display: block; margin-bottom: 16px; }
-  .placeholder-text { font-family: 'Orbitron', sans-serif; font-size: 0.7rem; letter-spacing: 0.2em; color: var(--muted); }
+  .placeholder-icon { font-size: 2.8rem; opacity: 0.2; display: block; margin-bottom: 10px; }
+  .placeholder-text { font-family: 'Orbitron', sans-serif; font-size: 0.65rem; letter-spacing: 0.2em; color: var(--muted); }
 
   #gameFrame {
-    width: 100%; height: 100%; min-height: 440px;
+    width: 100%; height: 100%;
     border: none; display: none; background: white;
   }
   #imageView {
-    max-width: 100%; max-height: 440px; object-fit: contain;
+    max-width: 100%; max-height: 100%; object-fit: contain;
     display: none; border-radius: 4px;
   }
   #codeView {
-    width: 100%; height: 440px; overflow: auto; display: none;
-    padding: 16px; background: #000;
-    font-family: 'Share Tech Mono', monospace; font-size: 0.78rem;
+    width: 100%; height: 100%; overflow: auto; display: none;
+    padding: 12px; background: #000;
+    font-family: 'Share Tech Mono', monospace; font-size: 0.72rem;
     line-height: 1.6; color: #aaffaa; white-space: pre;
   }
   #binaryView {
     display: none; flex-direction: column; align-items: center;
-    justify-content: center; gap: 16px; text-align: center; padding: 30px;
+    justify-content: center; gap: 12px; text-align: center; padding: 20px;
   }
-  .binary-icon { font-size: 4rem; }
-  .binary-info { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--muted); line-height: 2; }
+  .binary-icon { font-size: 3rem; }
+  .binary-info { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: var(--muted); line-height: 2; }
   .binary-info span { color: var(--accent); }
 
   .open-blank-btn {
-    font-family: 'Orbitron', sans-serif; font-size: 0.65rem; letter-spacing: 0.15em;
-    padding: 10px 24px; border-radius: 4px; border: 1px solid var(--accent);
+    font-family: 'Orbitron', sans-serif; font-size: 0.6rem; letter-spacing: 0.12em;
+    padding: 7px 18px; border-radius: 4px; border: 1px solid var(--accent);
     background: transparent; color: var(--accent); cursor: pointer;
-    text-transform: uppercase; transition: all 0.3s; margin-top: 8px;
+    text-transform: uppercase; transition: all 0.3s; margin-top: 4px;
     position: relative; overflow: hidden;
   }
   .open-blank-btn::before {
@@ -309,73 +309,74 @@
   .settings-overlay.open { display: flex; }
   .settings-box {
     background: var(--panel); border: 1px solid var(--border);
-    border-radius: 12px; padding: 30px; width: 100%; max-width: 480px;
+    border-radius: 10px; padding: 20px; width: 100%; max-width: 440px;
     position: relative; animation: slideIn 0.3s ease;
+    max-height: 90vh; overflow-y: auto;
   }
   @keyframes slideIn { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   .settings-title {
-    font-family: 'Orbitron', sans-serif; font-size: 1rem; letter-spacing: 0.15em;
-    color: var(--accent); margin-bottom: 24px;
+    font-family: 'Orbitron', sans-serif; font-size: 0.85rem; letter-spacing: 0.15em;
+    color: var(--accent); margin-bottom: 16px;
     text-shadow: var(--glow);
   }
   .settings-close {
-    position: absolute; top: 20px; right: 20px;
+    position: absolute; top: 16px; right: 16px;
     background: none; border: none; color: var(--muted); cursor: pointer;
-    font-size: 1.2rem; transition: color 0.2s;
+    font-size: 1.1rem; transition: color 0.2s;
   }
   .settings-close:hover { color: var(--accent2); }
 
-  .setting-group { margin-bottom: 20px; }
-  .setting-label { font-size: 0.7rem; letter-spacing: 0.15em; color: var(--muted); margin-bottom: 10px; text-transform: uppercase; }
-  .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .setting-group { margin-bottom: 14px; }
+  .setting-label { font-size: 0.65rem; letter-spacing: 0.15em; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
+  .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
   .theme-btn {
-    padding: 10px 6px; border-radius: 6px; border: 1px solid var(--border);
+    padding: 8px 4px; border-radius: 5px; border: 1px solid var(--border);
     cursor: pointer; font-family: 'Orbitron', sans-serif;
-    font-size: 0.55rem; letter-spacing: 0.1em;
+    font-size: 0.5rem; letter-spacing: 0.08em;
     text-align: center; transition: all 0.2s; color: var(--muted);
     background: rgba(255,255,255,0.02);
   }
   .theme-btn:hover, .theme-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(0,245,255,0.06); }
-  .theme-dot { display: block; width: 20px; height: 20px; border-radius: 50%; margin: 0 auto 6px; }
+  .theme-dot { display: block; width: 16px; height: 16px; border-radius: 50%; margin: 0 auto 4px; }
 
   .toggle-row {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 0; border-bottom: 1px solid var(--border);
+    padding: 7px 0; border-bottom: 1px solid var(--border);
   }
   .toggle-row:last-child { border-bottom: none; }
-  .toggle-name { font-size: 0.8rem; color: var(--text); }
-  .toggle-sub { font-size: 0.65rem; color: var(--muted); margin-top: 2px; }
+  .toggle-name { font-size: 0.72rem; color: var(--text); }
+  .toggle-sub { font-size: 0.6rem; color: var(--muted); margin-top: 1px; }
   .toggle {
-    width: 40px; height: 22px; border-radius: 11px;
+    width: 36px; height: 20px; border-radius: 10px;
     background: var(--border); position: relative; cursor: pointer;
-    transition: background 0.2s; border: none;
+    transition: background 0.2s; border: none; flex-shrink: 0;
   }
   .toggle::after {
-    content: ''; position: absolute; width: 16px; height: 16px;
+    content: ''; position: absolute; width: 14px; height: 14px;
     border-radius: 50%; background: var(--muted); top: 3px; left: 3px;
     transition: all 0.2s;
   }
   .toggle.on { background: var(--accent); }
-  .toggle.on::after { background: var(--bg); left: 21px; }
+  .toggle.on::after { background: var(--bg); left: 19px; }
 
   /* Scale slider */
-  .slider-wrap { display: flex; align-items: center; gap: 12px; }
+  .slider-wrap { display: flex; align-items: center; gap: 10px; }
   .slider-wrap input[type=range] {
     flex: 1; appearance: none; height: 3px;
     background: var(--border); border-radius: 2px; outline: none;
   }
   .slider-wrap input[type=range]::-webkit-slider-thumb {
-    appearance: none; width: 14px; height: 14px; border-radius: 50%;
+    appearance: none; width: 13px; height: 13px; border-radius: 50%;
     background: var(--accent); cursor: pointer; box-shadow: 0 0 6px var(--accent);
   }
-  .slider-val { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--accent); width: 40px; text-align: right; }
+  .slider-val { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: var(--accent); width: 36px; text-align: right; }
 
   /* Status bar */
   .status-bar {
-    display: flex; align-items: center; gap: 16px;
-    padding: 10px 0; margin-top: 16px;
+    display: flex; align-items: center; gap: 12px;
+    padding: 6px 0; margin-top: 8px;
     border-top: 1px solid var(--border);
-    font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--muted);
+    font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: var(--muted);
     flex-wrap: wrap;
   }
   .status-dot {
@@ -405,13 +406,13 @@
   ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
   .corner-deco {
-    position: absolute; width: 12px; height: 12px;
+    position: absolute; width: 8px; height: 8px;
     border-color: var(--accent); border-style: solid; opacity: 0.5;
   }
-  .corner-deco.tl { top: 8px; left: 8px; border-width: 1px 0 0 1px; }
-  .corner-deco.tr { top: 8px; right: 8px; border-width: 1px 1px 0 0; }
-  .corner-deco.bl { bottom: 8px; left: 8px; border-width: 0 0 1px 1px; }
-  .corner-deco.br { bottom: 8px; right: 8px; border-width: 0 1px 1px 0; }
+  .corner-deco.tl { top: 6px; left: 6px; border-width: 1px 0 0 1px; }
+  .corner-deco.tr { top: 6px; right: 6px; border-width: 1px 1px 0 0; }
+  .corner-deco.bl { bottom: 6px; left: 6px; border-width: 0 0 1px 1px; }
+  .corner-deco.br { bottom: 6px; right: 6px; border-width: 0 1px 1px 0; }
 </style>
 </head>
 <body>
@@ -467,9 +468,9 @@
         <div class="file-list" id="fileList"></div>
       </div>
 
-      <div class="panel" style="margin-top:16px;">
+      <div class="panel" style="margin-top:8px;">
         <div class="panel-title">▶ QUICK ACTIONS</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;flex-direction:column;gap:6px;">
           <button class="btn" onclick="openInBlank()" style="width:100%;text-align:center;">🚀 OPEN IN NEW TAB</button>
           <button class="btn danger" onclick="reloadFrame()" style="width:100%;text-align:center;">↺ RELOAD GAME</button>
           <button class="btn" onclick="toggleFullscreen()" style="width:100%;text-align:center;">⛶ FULLSCREEN MODE</button>
@@ -495,7 +496,7 @@
         <iframe id="gameFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups allow-pointer-lock allow-top-navigation"></iframe>
         <img id="imageView" alt="Game preview"/>
         <pre id="codeView"></pre>
-        <div id="batView" style="display:none;width:100%;height:440px;overflow:hidden;flex-direction:column;background:#000;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
+        <div id="batView" style="display:none;width:100%;height:100%;overflow:hidden;flex-direction:column;background:#000;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
           <div id="batHeader" style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#0a0a1e;border-bottom:1px solid #1a1a3e;flex-shrink:0;">
             <span style="color:var(--accent);letter-spacing:.1em;font-size:.65rem;">BATCH SIMULATOR</span>
             <div style="display:flex;gap:8px;">
