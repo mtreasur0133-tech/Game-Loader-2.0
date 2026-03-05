@@ -53,7 +53,6 @@
     position: relative;
   }
 
-  /* Animated grid background */
   body::before {
     content: '';
     position: fixed; inset: 0; z-index: 0;
@@ -77,7 +76,6 @@
     100% { background-position: 40px 40px, 40px 40px; }
   }
 
-  /* Floating orbs */
   .orb {
     position: fixed; border-radius: 50%; filter: blur(80px);
     pointer-events: none; z-index: 0; animation: orbFloat 8s ease-in-out infinite;
@@ -93,7 +91,6 @@
 
   .wrapper { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 10px 16px; }
 
-  /* Header */
   header {
     text-align: center; padding: 12px 20px 8px;
     position: relative;
@@ -120,7 +117,6 @@
   }
   @keyframes blink { 50% { opacity: 0.4; } }
 
-  /* Toolbar */
   .toolbar {
     display: flex; align-items: center; gap: 8px;
     justify-content: flex-end; margin-bottom: 8px; flex-wrap: wrap;
@@ -145,7 +141,6 @@
   .btn.danger::before { background: var(--accent2); }
   .btn.danger:hover { box-shadow: var(--glow2); }
 
-  /* Main panels */
   .main-grid {
     display: grid; grid-template-columns: 268px 1fr; gap: 10px;
     align-items: start;
@@ -177,7 +172,6 @@
     background: linear-gradient(90deg, var(--border), transparent);
   }
 
-  /* Drop zone */
   .drop-zone {
     border: 2px dashed var(--border); border-radius: 6px;
     padding: 14px 12px; text-align: center;
@@ -215,7 +209,6 @@
 
   #fileInput { display: none; }
 
-  /* File list */
   .file-list { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
   .file-item {
     display: flex; align-items: center; gap: 8px;
@@ -236,7 +229,6 @@
   .file-remove { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.75rem; padding: 1px 4px; border-radius: 3px; transition: all 0.2s; }
   .file-remove:hover { color: var(--accent2); }
 
-  /* Viewer */
   .viewer-panel { display: flex; flex-direction: column; }
   .viewer-header {
     display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;
@@ -286,6 +278,26 @@
   .binary-info { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: var(--muted); line-height: 2; }
   .binary-info span { color: var(--accent); }
 
+  /* MHTML loading overlay */
+  #mhtmlLoading {
+    display: none; flex-direction: column; align-items: center;
+    justify-content: center; gap: 14px; text-align: center; padding: 24px;
+  }
+  .mhtml-spinner {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .mhtml-status {
+    font-family: 'Share Tech Mono', monospace; font-size: 0.72rem;
+    color: var(--accent); letter-spacing: 0.1em;
+  }
+  .mhtml-sub {
+    font-size: 0.62rem; color: var(--muted);
+  }
+
   .open-blank-btn {
     font-family: 'Orbitron', sans-serif; font-size: 0.6rem; letter-spacing: 0.12em;
     padding: 7px 18px; border-radius: 4px; border: 1px solid var(--accent);
@@ -300,7 +312,6 @@
   .open-blank-btn:hover::before { transform: translateX(0); }
   .open-blank-btn:hover { color: var(--bg); box-shadow: var(--glow); }
 
-  /* Settings panel */
   .settings-overlay {
     position: fixed; inset: 0; z-index: 100;
     background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
@@ -359,7 +370,6 @@
   .toggle.on { background: var(--accent); }
   .toggle.on::after { background: var(--bg); left: 19px; }
 
-  /* Scale slider */
   .slider-wrap { display: flex; align-items: center; gap: 10px; }
   .slider-wrap input[type=range] {
     flex: 1; appearance: none; height: 3px;
@@ -371,7 +381,6 @@
   }
   .slider-val { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: var(--accent); width: 36px; text-align: right; }
 
-  /* Status bar */
   .status-bar {
     display: flex; align-items: center; gap: 12px;
     padding: 6px 0; margin-top: 8px;
@@ -388,7 +397,6 @@
   @keyframes statusPulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
   .status-item { display: flex; align-items: center; }
 
-  /* Notification toast */
   .toast {
     position: fixed; bottom: 30px; right: 30px; z-index: 200;
     background: var(--panel); border: 1px solid var(--accent);
@@ -399,7 +407,6 @@
   }
   .toast.show { transform: translateY(0); opacity: 1; }
 
-  /* Scrollbar */
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: var(--panel); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -413,6 +420,12 @@
   .corner-deco.tr { top: 6px; right: 6px; border-width: 1px 1px 0 0; }
   .corner-deco.bl { bottom: 6px; left: 6px; border-width: 0 0 1px 1px; }
   .corner-deco.br { bottom: 6px; right: 6px; border-width: 0 1px 1px 0; }
+
+  #batView {
+    display:none;width:100%;height:100%;overflow:hidden;
+    flex-direction:column;background:#000;
+    font-family:'Share Tech Mono',monospace;font-size:0.8rem;
+  }
 </style>
 </head>
 <body>
@@ -424,7 +437,7 @@
 <div class="wrapper">
   <header>
     <div class="logo">ARCADE<span>VAULT</span></div>
-    <div class="tagline">:: UNIVERSAL GAME FILE LOADER v2.0 ::</div>
+    <div class="tagline">:: UNIVERSAL GAME FILE LOADER v2.1 ::</div>
   </header>
 
   <div class="toolbar">
@@ -433,7 +446,6 @@
   </div>
 
   <div class="main-grid">
-    <!-- Left: File loader -->
     <div>
       <div class="panel">
         <div class="corner-deco tl"></div><div class="corner-deco tr"></div>
@@ -478,7 +490,6 @@
       </div>
     </div>
 
-    <!-- Right: Viewer -->
     <div class="panel viewer-panel">
       <div class="corner-deco tl"></div><div class="corner-deco tr"></div>
       <div class="corner-deco bl"></div><div class="corner-deco br"></div>
@@ -496,7 +507,7 @@
         <iframe id="gameFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups allow-pointer-lock allow-top-navigation"></iframe>
         <img id="imageView" alt="Game preview"/>
         <pre id="codeView"></pre>
-        <div id="batView" style="display:none;width:100%;height:100%;overflow:hidden;flex-direction:column;background:#000;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
+        <div id="batView">
           <div id="batHeader" style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#0a0a1e;border-bottom:1px solid #1a1a3e;flex-shrink:0;">
             <span style="color:var(--accent);letter-spacing:.1em;font-size:.65rem;">BATCH SIMULATOR</span>
             <div style="display:flex;gap:8px;">
@@ -509,6 +520,12 @@
           <div id="batFooter" style="padding:6px 14px;background:#0a0a1e;border-top:1px solid #1a1a3e;font-size:.6rem;color:var(--muted);flex-shrink:0;">
             <span id="batStepInfo">—</span>
           </div>
+        </div>
+        <!-- MHTML loading indicator -->
+        <div id="mhtmlLoading">
+          <div class="mhtml-spinner"></div>
+          <div class="mhtml-status" id="mhtmlStatus">PARSING MHTML...</div>
+          <div class="mhtml-sub" id="mhtmlSub">Extracting embedded resources</div>
         </div>
         <div id="binaryView">
           <div class="binary-icon" id="binaryIcon">📦</div>
@@ -527,7 +544,6 @@
   </div>
 </div>
 
-<!-- Settings overlay -->
 <div class="settings-overlay" id="settingsOverlay">
   <div class="settings-box">
     <div class="corner-deco tl"></div><div class="corner-deco tr"></div>
@@ -596,12 +612,14 @@
     theme: 'default',
     scale: 100,
     autoOpen: false,
+    mhtmlBlobUrls: [],
+    mhtmlReconstructed: null,
   };
 
-  // File type detection
   const typeMap = {
     html: { icon:'🌐', label:'HTML GAME', viewer:'frame' },
-    mhtml: { icon:'🌐', label:'MHTML GAME', viewer:'frame' },
+    mhtml: { icon:'🌐', label:'MHTML GAME', viewer:'mhtml' },
+    mht: { icon:'🌐', label:'MHT PAGE', viewer:'mhtml' },
     htm: { icon:'🌐', label:'HTML GAME', viewer:'frame' },
     js: { icon:'⚡', label:'JAVASCRIPT', viewer:'code' },
     py: { icon:'🐍', label:'PYTHON', viewer:'code' },
@@ -632,20 +650,21 @@
     pdf: { icon:'📑', label:'PDF DOCUMENT', viewer:'frame' },
   };
 
-  // Archive extensions that we can extract
   const ARCHIVE_EXTS = new Set(['zip','tar','gz','tgz']);
 
   function getFileType(name) {
     const lower = name.toLowerCase();
-    // Handle compound extensions first
     if(lower.endsWith('.tar.gz') || lower.endsWith('.tar.bz2') || lower.endsWith('.tar.xz')) {
       return { icon:'📦', label:'TAR.GZ GAME', viewer:'zip' };
+    }
+    // Check for .mhtml before generic ext split
+    if(lower.endsWith('.mhtml') || lower.endsWith('.mht')) {
+      return { icon:'🌐', label:'MHTML PAGE', viewer:'mhtml' };
     }
     const ext = lower.split('.').pop();
     return typeMap[ext] || { icon:'❓', label:ext.toUpperCase()+' FILE', viewer:'binary' };
   }
 
-  // Detect archive format from filename
   function detectArchiveFormat(name) {
     const lower = name.toLowerCase();
     if(lower.endsWith('.tar.gz') || lower.endsWith('.tgz')) return 'tgz';
@@ -662,7 +681,232 @@
     return (bytes/1048576).toFixed(2)+'MB';
   }
 
-  // Drag & drop
+  // ══════════════════════════════════════════════════════════════════
+  // MHTML PARSER
+  // ══════════════════════════════════════════════════════════════════
+
+  /**
+   * Decode quoted-printable encoding.
+   * Soft line breaks (=\r\n or =\n) are joined, =XX hex sequences decoded.
+   */
+  function decodeQuotedPrintable(str) {
+    return str
+      .replace(/=\r\n/g, '')
+      .replace(/=\n/g, '')
+      .replace(/=([0-9A-Fa-f]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+  }
+
+  /**
+   * Parse the MIME headers block (everything before the first blank line).
+   * Returns { headers: Map<lowercase-key, value>, body: string }
+   */
+  function parseMIMEHeaders(text) {
+    const headers = new Map();
+    // Headers can have folded continuation lines (lines starting with whitespace)
+    const foldedText = text.replace(/\r\n([ \t])/g, ' $1').replace(/\n([ \t])/g, ' $1');
+    const blankLine = foldedText.search(/\r?\n\r?\n/);
+    const headerBlock = blankLine === -1 ? foldedText : foldedText.slice(0, blankLine);
+    const body = blankLine === -1 ? '' : foldedText.slice(blankLine).replace(/^\r?\n\r?\n/, '');
+
+    for(const line of headerBlock.split(/\r?\n/)) {
+      const colon = line.indexOf(':');
+      if(colon === -1) continue;
+      const key = line.slice(0, colon).trim().toLowerCase();
+      const val = line.slice(colon + 1).trim();
+      headers.set(key, val);
+    }
+    return { headers, body };
+  }
+
+  /**
+   * Extract a parameter value from a header like:
+   *   Content-Type: text/html; charset="utf-8"; boundary="----abc"
+   */
+  function getHeaderParam(headerVal, param) {
+    const re = new RegExp(param + '\\s*=\\s*(?:"([^"]+)"|([^;\\s]+))', 'i');
+    const m = headerVal.match(re);
+    return m ? (m[1] || m[2]) : null;
+  }
+
+  /**
+   * Full MHTML → reconstructed HTML string.
+   * Returns the main HTML with all embedded resources inlined as data: URIs.
+   */
+  async function parseMHTML(file) {
+    const rawText = await readFileAsText(file);
+
+    // --- 1. Parse outer MIME headers to get boundary ---
+    const { headers: outerHeaders, body: outerBody } = parseMIMEHeaders(rawText);
+    const contentType = outerHeaders.get('content-type') || '';
+    let boundary = getHeaderParam(contentType, 'boundary');
+
+    if(!boundary) {
+      // Fallback: scan for boundary= anywhere in first 2KB
+      const top = rawText.slice(0, 2000);
+      const bm = top.match(/boundary=["']?([^"'\r\n;]+)/i);
+      boundary = bm ? bm[1].trim() : null;
+    }
+
+    if(!boundary) throw new Error('Could not find MIME boundary in MHTML file.');
+
+    // --- 2. Split into parts ---
+    // The boundary delimiter is "--" + boundary
+    const delim = '--' + boundary;
+    const parts = rawText.split(delim);
+    // parts[0] = preamble (ignore), last part = "--" epilogue (ignore)
+
+    const resources = []; // { contentType, contentLocation, transferEncoding, data }
+
+    for(let i = 1; i < parts.length - 1; i++) {
+      const part = parts[i];
+      // Each part: optional \r\n, then headers, blank line, then body
+      const { headers, body } = parseMIMEHeaders(part.replace(/^\r?\n/, ''));
+
+      const ct  = headers.get('content-type') || 'application/octet-stream';
+      const loc = headers.get('content-location') || headers.get('content-id') || '';
+      const enc = (headers.get('content-transfer-encoding') || '').toLowerCase().trim();
+
+      resources.push({ contentType: ct, contentLocation: loc, transferEncoding: enc, rawBody: body });
+    }
+
+    if(resources.length === 0) throw new Error('No MIME parts found in MHTML.');
+
+    // --- 3. Build a URL→dataURL map for all non-HTML resources ---
+    // The first part is usually the main HTML document
+    const urlMap = new Map(); // original URL → data: URI string
+
+    // Process non-first parts first so we can rewrite the main HTML
+    for(let i = 1; i < resources.length; i++) {
+      const r = resources[i];
+      const dataUrl = resourceToDataURL(r);
+      if(r.contentLocation) {
+        // Store under multiple key forms for flexible lookup
+        urlMap.set(r.contentLocation, dataUrl);
+        // Also store just the filename portion
+        try {
+          const u = new URL(r.contentLocation);
+          urlMap.set(u.pathname.split('/').pop(), dataUrl);
+          urlMap.set(u.pathname, dataUrl);
+          urlMap.set(u.href, dataUrl);
+        } catch(e) {
+          // Not a valid URL — store as-is
+          urlMap.set(r.contentLocation.split('/').pop(), dataUrl);
+        }
+      }
+    }
+
+    // --- 4. Get the main HTML body ---
+    if(resources.length === 0) throw new Error('MHTML has no parts.');
+    const mainRes = resources[0];
+    let mainHTML = decodePartBody(mainRes);
+
+    // --- 5. Rewrite all asset references in the HTML ---
+    mainHTML = rewriteMHTMLAssets(mainHTML, urlMap);
+
+    return mainHTML;
+  }
+
+  /** Convert a MIME part's body to a data: URI string */
+  function resourceToDataURL(r) {
+    const mimeType = r.contentType.split(';')[0].trim();
+    if(r.transferEncoding === 'base64') {
+      // Already base64 — clean up whitespace and build data URI
+      const b64 = r.rawBody.replace(/\s+/g, '');
+      return `data:${mimeType};base64,${b64}`;
+    } else if(r.transferEncoding === 'quoted-printable') {
+      const decoded = decodeQuotedPrintable(r.rawBody);
+      const b64 = btoa(unescape(encodeURIComponent(decoded)));
+      return `data:${mimeType};base64,${b64}`;
+    } else {
+      // 7bit / 8bit / identity — treat as UTF-8 text
+      try {
+        const b64 = btoa(unescape(encodeURIComponent(r.rawBody)));
+        return `data:${mimeType};base64,${b64}`;
+      } catch(e) {
+        return `data:${mimeType};charset=utf-8,${encodeURIComponent(r.rawBody)}`;
+      }
+    }
+  }
+
+  /** Decode a MIME part body to a string (for the main HTML part) */
+  function decodePartBody(r) {
+    if(r.transferEncoding === 'quoted-printable') {
+      return decodeQuotedPrintable(r.rawBody);
+    } else if(r.transferEncoding === 'base64') {
+      try {
+        return atob(r.rawBody.replace(/\s+/g, ''));
+      } catch(e) {
+        return r.rawBody;
+      }
+    }
+    return r.rawBody;
+  }
+
+  /**
+   * Rewrite src, href, url() references in HTML to use the data: URIs from urlMap.
+   * Uses multiple matching strategies to handle relative and absolute URLs.
+   */
+  function rewriteMHTMLAssets(html, urlMap) {
+    function resolveAsset(val) {
+      if(!val || val.startsWith('data:') || val.startsWith('javascript:') || val.startsWith('#')) return null;
+
+      // Direct hit
+      if(urlMap.has(val)) return urlMap.get(val);
+
+      // Try without query string
+      const noQuery = val.split('?')[0];
+      if(urlMap.has(noQuery)) return urlMap.get(noQuery);
+
+      // Try just the filename
+      const filename = val.split('/').pop().split('?')[0];
+      if(filename && urlMap.has(filename)) return urlMap.get(filename);
+
+      // Try URL pathname matching
+      try {
+        const u = new URL(val);
+        if(urlMap.has(u.href)) return urlMap.get(u.href);
+        if(urlMap.has(u.pathname)) return urlMap.get(u.pathname);
+        const pFilename = u.pathname.split('/').pop();
+        if(pFilename && urlMap.has(pFilename)) return urlMap.get(pFilename);
+      } catch(e) {}
+
+      return null;
+    }
+
+    // src="..." and href="..."
+    html = html.replace(/(src|href|action|data)=["']([^"'#?][^"']*)["']/gi, (match, attr, val) => {
+      const replacement = resolveAsset(val);
+      return replacement ? `${attr}="${replacement}"` : match;
+    });
+
+    // url(...) in style attributes and <style> blocks
+    html = html.replace(/url\(["']?([^"')#?][^"')]*?)["']?\)/gi, (match, val) => {
+      const replacement = resolveAsset(val);
+      return replacement ? `url("${replacement}")` : match;
+    });
+
+    // @import "..." in CSS
+    html = html.replace(/@import\s+["']([^"']+)["']/gi, (match, val) => {
+      const replacement = resolveAsset(val);
+      return replacement ? `@import "${replacement}"` : match;
+    });
+
+    return html;
+  }
+
+  function readFileAsText(f) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = e => res(e.target.result);
+      r.onerror = () => rej(new Error('File read failed'));
+      r.readAsText(f, 'utf-8');
+    });
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // DRAG & DROP / FILE INPUT
+  // ══════════════════════════════════════════════════════════════════
+
   const dropZone = document.getElementById('dropZone');
   dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
   dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
@@ -705,10 +949,8 @@
   function removeFile(e, i) {
     e.stopPropagation();
     state.files.splice(i, 1);
-    if(state.activeIndex === i) {
-      state.activeIndex = -1;
-      resetViewer();
-    } else if(state.activeIndex > i) state.activeIndex--;
+    if(state.activeIndex === i) { state.activeIndex = -1; resetViewer(); }
+    else if(state.activeIndex > i) state.activeIndex--;
     renderFileList();
     document.getElementById('fileCount').textContent = state.files.length;
     showToast('File removed');
@@ -721,15 +963,22 @@
     showToast('All files cleared');
   }
 
-  function resetViewer() {
-    document.getElementById('placeholder').style.display = 'flex';
-    document.getElementById('placeholder').style.flexDirection = 'column';
-    document.getElementById('placeholder').style.alignItems = 'center';
+  function hideAllViewers() {
+    document.getElementById('placeholder').style.display = 'none';
     document.getElementById('gameFrame').style.display = 'none';
     document.getElementById('imageView').style.display = 'none';
     document.getElementById('codeView').style.display = 'none';
     document.getElementById('batView').style.display = 'none';
     document.getElementById('binaryView').style.display = 'none';
+    document.getElementById('mhtmlLoading').style.display = 'none';
+  }
+
+  function resetViewer() {
+    document.getElementById('placeholder').style.display = 'flex';
+    document.getElementById('placeholder').style.flexDirection = 'column';
+    document.getElementById('placeholder').style.alignItems = 'center';
+    hideAllViewers();
+    document.getElementById('placeholder').style.display = 'flex';
     document.getElementById('viewerName').textContent = 'No file loaded';
     document.getElementById('viewerBadge').textContent = 'STANDBY';
     document.getElementById('statusDot').className = 'status-dot';
@@ -739,9 +988,10 @@
     if(state.activeURL) { URL.revokeObjectURL(state.activeURL); state.activeURL = null; }
     if(state.zipBlobUrls) { state.zipBlobUrls.forEach(u => URL.revokeObjectURL(u)); state.zipBlobUrls = null; }
     state.zipEntryHTML = null;
+    state.mhtmlReconstructed = null;
   }
 
-  function loadFile(i) {
+  async function loadFile(i) {
     state.activeIndex = i;
     const f = state.files[i];
     const t = getFileType(f.name);
@@ -754,19 +1004,16 @@
     document.getElementById('fileTypeStatus').textContent = t.label;
     document.getElementById('fileSizeStatus').textContent = formatSize(f.size);
 
-    // Hide all
-    document.getElementById('placeholder').style.display = 'none';
-    document.getElementById('gameFrame').style.display = 'none';
-    document.getElementById('imageView').style.display = 'none';
-    document.getElementById('codeView').style.display = 'none';
-    document.getElementById('batView').style.display = 'none';
-    document.getElementById('binaryView').style.display = 'none';
+    hideAllViewers();
 
     if(state.activeURL) URL.revokeObjectURL(state.activeURL);
     if(state.zipBlobUrls) { state.zipBlobUrls.forEach(u => URL.revokeObjectURL(u)); state.zipBlobUrls = null; }
     state.zipEntryHTML = null;
+    state.mhtmlReconstructed = null;
 
-    if(t.viewer === 'frame') {
+    if(t.viewer === 'mhtml') {
+      await loadMHTML(f);
+    } else if(t.viewer === 'frame') {
       const url = URL.createObjectURL(f);
       state.activeURL = url;
       const frame = document.getElementById('gameFrame');
@@ -803,10 +1050,8 @@
       };
       reader.readAsText(f);
     } else if(t.viewer === 'zip') {
-      // Archive: extract and launch
       loadArchive(f);
     } else {
-      // Binary
       const bv = document.getElementById('binaryView');
       bv.style.display = 'flex';
       document.getElementById('binaryIcon').textContent = t.icon;
@@ -818,7 +1063,61 @@
     }
   }
 
-  // MIME type helper for zip contents
+  // ══════════════════════════════════════════════════════════════════
+  // MHTML LOADER
+  // ══════════════════════════════════════════════════════════════════
+
+  async function loadMHTML(f) {
+    // Show loading indicator
+    const loadingEl = document.getElementById('mhtmlLoading');
+    loadingEl.style.display = 'flex';
+    document.getElementById('mhtmlStatus').textContent = 'PARSING MHTML...';
+    document.getElementById('mhtmlSub').textContent = `Reading ${formatSize(f.size)} file`;
+    setStatus('PARSING...');
+
+    try {
+      document.getElementById('mhtmlStatus').textContent = 'EXTRACTING PARTS...';
+      document.getElementById('mhtmlSub').textContent = 'Decoding embedded resources';
+
+      const reconstructedHTML = await parseMHTML(f);
+      state.mhtmlReconstructed = reconstructedHTML;
+
+      document.getElementById('mhtmlStatus').textContent = 'RENDERING...';
+      document.getElementById('mhtmlSub').textContent = 'Loading in viewer';
+
+      // Write into iframe via blob
+      const blob = new Blob([reconstructedHTML], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      state.activeURL = url;
+
+      // Hide loading, show frame
+      loadingEl.style.display = 'none';
+      const frame = document.getElementById('gameFrame');
+      frame.style.display = 'block';
+      frame.src = url;
+      frame.onload = () => setStatus('RUNNING');
+
+      showToast('MHTML loaded successfully ✓');
+      if(state.autoOpen) window.open(url, '_blank');
+    } catch(err) {
+      console.error('MHTML parse error:', err);
+      loadingEl.style.display = 'none';
+
+      // Show error in binary view
+      const bv = document.getElementById('binaryView');
+      bv.style.display = 'flex';
+      document.getElementById('binaryIcon').textContent = '⚠️';
+      document.getElementById('binaryInfo').innerHTML =
+        `<span style="color:var(--accent2);">MHTML Parse Error</span>\n${escapeHtml(err.message)}\n\nTry opening in new tab instead.`;
+      setStatus('ERROR');
+      showToast('MHTML error: ' + err.message.slice(0, 40));
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // ARCHIVE HANDLING (zip / tar / tgz / gz)
+  // ══════════════════════════════════════════════════════════════════
+
   function getMime(filename) {
     const ext = filename.split('.').pop().toLowerCase();
     const mimes = {
@@ -835,7 +1134,6 @@
     return mimes[ext] || 'application/octet-stream';
   }
 
-  // Rank an HTML file as a likely entry point (lower = better)
   function entryScore(path) {
     const name = path.split('/').pop().toLowerCase();
     const depth = path.split('/').length - 1;
@@ -853,31 +1151,19 @@
     document.getElementById('viewerBadge').textContent = format.toUpperCase() + ' GAME';
 
     try {
-      let fileMap = {}; // path → Uint8Array
-
-      if(format === 'zip') {
-        fileMap = await extractZip(f);
-      } else if(format === 'tgz') {
-        fileMap = await extractTgz(f);
-      } else if(format === 'tar') {
-        fileMap = await extractTar(f);
-      } else if(format === 'gz') {
-        // Single-file gzip — decompress and treat as a single file
-        fileMap = await extractGz(f);
-      } else {
-        throw new Error('Unsupported archive format: ' + format);
-      }
-
+      let fileMap = {};
+      if(format === 'zip') fileMap = await extractZip(f);
+      else if(format === 'tgz') fileMap = await extractTgz(f);
+      else if(format === 'tar') fileMap = await extractTar(f);
+      else if(format === 'gz') fileMap = await extractGz(f);
+      else throw new Error('Unsupported archive format: ' + format);
       await renderArchiveFiles(fileMap, f);
-
     } catch(err) {
       console.error(err);
       showToast('Archive error: ' + err.message);
       setStatus('ERROR');
     }
   }
-
-  // ── Extractors ────────────────────────────────────────────────────────────
 
   async function extractZip(f) {
     const zip = await JSZip.loadAsync(f);
@@ -893,7 +1179,6 @@
   }
 
   async function extractTgz(f) {
-    // Read file as ArrayBuffer, decompress gzip, then parse tar
     const buf = await readFileAsArrayBuffer(f);
     const uint8 = new Uint8Array(buf);
     const decompressed = fflate.decompressSync(uint8);
@@ -906,7 +1191,6 @@
   }
 
   async function extractGz(f) {
-    // Single gzip file — decompress and expose under the original name minus .gz
     const buf = await readFileAsArrayBuffer(f);
     const decompressed = fflate.decompressSync(new Uint8Array(buf));
     const innerName = f.name.replace(/\.gz$/i, '') || 'file';
@@ -922,49 +1206,31 @@
     });
   }
 
-  // Minimal TAR parser — supports ustar and POSIX tar
   function parseTar(data) {
     const fileMap = {};
     let offset = 0;
     const decoder = new TextDecoder();
-
     while(offset + 512 <= data.length) {
       const header = data.subarray(offset, offset + 512);
-
-      // Check for end-of-archive (two zero blocks)
       let allZero = true;
       for(let i = 0; i < 512; i++) { if(header[i] !== 0) { allZero = false; break; } }
       if(allZero) break;
-
-      // Parse filename (bytes 0–99) + prefix (bytes 345–499 in ustar)
       let name = decoder.decode(header.subarray(0, 100)).replace(/\0/g, '').trim();
       const prefix = decoder.decode(header.subarray(345, 500)).replace(/\0/g, '').trim();
       if(prefix) name = prefix + '/' + name;
-
-      // File size (bytes 124–135, octal string)
       const sizeStr = decoder.decode(header.subarray(124, 136)).replace(/\0/g, '').trim();
       const size = parseInt(sizeStr, 8) || 0;
-
-      // Type flag (byte 156): '0' or '\0' = regular file, '5' = directory
       const typeFlag = String.fromCharCode(header[156]);
-
-      offset += 512; // move past header
-
+      offset += 512;
       if((typeFlag === '0' || typeFlag === '\0') && name && !name.endsWith('/')) {
-        // Skip macOS junk
         if(!name.startsWith('__MACOSX') && !name.includes('.DS_Store')) {
           fileMap[name] = data.subarray(offset, offset + size);
         }
       }
-
-      // Advance past file data (padded to 512-byte blocks)
       offset += Math.ceil(size / 512) * 512;
     }
-
     return fileMap;
   }
-
-  // ── Renderer (shared by all archive types) ────────────────────────────────
 
   const decoder = new TextDecoder();
 
@@ -1023,8 +1289,6 @@
     await renderGeneratedHTML(html, blobMap, fileCount, originalFile, 'EXPLORER');
   }
 
-  // ── Detection helpers ─────────────────────────────────────────────────────
-
   function detectUVPackage(paths, pkg) {
     const allPaths = paths.join(' ');
     let score = 0;
@@ -1056,11 +1320,8 @@
       || paths.find(p => p.endsWith('.js') && !p.endsWith('.map') && !p.includes('node_modules'));
   }
 
-  // ── HTML Generators ───────────────────────────────────────────────────────
-
   function generateUVLauncher(fileMap, blobMap, rootDir, pkg) {
     const paths = Object.keys(blobMap);
-
     const get = (...names) => {
       for(const n of names) {
         const found = paths.find(p => p.endsWith('/' + n) || p === n || p === rootDir + n || p === rootDir + 'dist/' + n);
@@ -1068,15 +1329,13 @@
       }
       return null;
     };
-
-    const uvConfig   = get('uv.config.js');
-    const uvBundle   = get('uv.bundle.js');
-    const uvClient   = get('uv.client.js');
-    const uvHandler  = get('uv.handler.js');
-    const uvSW       = get('uv.sw.js');
-    const sw         = get('sw.js');
-    const swUrl      = uvSW || sw || '';
-
+    const uvConfig  = get('uv.config.js');
+    const uvBundle  = get('uv.bundle.js');
+    const uvClient  = get('uv.client.js');
+    const uvHandler = get('uv.handler.js');
+    const uvSW      = get('uv.sw.js');
+    const sw        = get('sw.js');
+    const swUrl     = uvSW || sw || '';
     const pkgName = pkg?.name || 'Ultraviolet Proxy';
     const pkgVer  = pkg?.version ? ' v' + pkg.version : '';
 
@@ -1231,8 +1490,6 @@ window.addEventListener('load', () => {
 </body></html>`;
   }
 
-  // ── Mount and render helpers ──────────────────────────────────────────────
-
   async function mountAndRender(fileMap, blobMap, entryPath, originalFile, fileCount) {
     const entryDir = entryPath.includes('/') ? entryPath.substring(0, entryPath.lastIndexOf('/') + 1) : '';
     let html = decoder.decode(fileMap[entryPath]);
@@ -1280,7 +1537,6 @@ window.addEventListener('load', () => {
   }
 
   function resolveZipPath(baseDir, relativePath) {
-    // Handle ../ and ./ in paths relative to entry HTML's directory
     const parts = (baseDir + relativePath).split('/');
     const resolved = [];
     for(const p of parts) {
@@ -1290,7 +1546,9 @@ window.addEventListener('load', () => {
     return resolved.join('/');
   }
 
-  // ── BAT / SH SIMULATOR ───────────────────────────────────────────────────
+  // ══════════════════════════════════════════════════════════════════
+  // BAT / SH SIMULATOR
+  // ══════════════════════════════════════════════════════════════════
 
   let batSimTimer = null;
 
@@ -1317,18 +1575,13 @@ window.addEventListener('load', () => {
     if(batSimTimer) { clearTimeout(batSimTimer); batSimTimer = null; }
     const term = document.getElementById('batTerminal');
     term.innerHTML = '';
-
     const isShell = filename.toLowerCase().endsWith('.sh');
     const lines = script.split(/\r?\n/);
     const steps = parseBatScript(lines, isShell);
-
-    // Print header
     appendBatLine(term, 'prompt', `${isShell ? 'SHELL' : 'BATCH'} SCRIPT SIMULATOR — ${filename}`, 'header');
     appendBatLine(term, 'prompt', `${steps.length} command(s) detected`, 'subheader');
     appendBatLine(term, 'divider', '─'.repeat(52), 'divider');
-
     document.getElementById('batStepInfo').textContent = `${steps.length} steps · simulated execution`;
-
     let delay = 300;
     steps.forEach((step, idx) => {
       batSimTimer = setTimeout(() => {
@@ -1349,249 +1602,63 @@ window.addEventListener('load', () => {
   function parseBatScript(lines, isShell) {
     const steps = [];
     const vars = {};
-
     for(let raw of lines) {
       const line = raw.trim();
       if(!line) continue;
-
-      // Comments
       if(line.startsWith('::') || line.startsWith('rem ') || line.toLowerCase().startsWith('rem\t') || line === 'rem') {
-        const comment = line.replace(/^::|^rem\s*/i, '').trim();
-        steps.push({ type:'comment', raw: line, command: line, explanation: comment || '(comment)', icon:'💬' });
-        continue;
+        steps.push({ type:'comment', raw:line, command:line, explanation:line.replace(/^::|^rem\s*/i,'').trim()||'(comment)', icon:'💬' }); continue;
       }
       if(isShell && line.startsWith('#')) {
-        steps.push({ type:'comment', raw: line, command: line, explanation: line.slice(1).trim() || '(comment)', icon:'💬' });
-        continue;
+        steps.push({ type:'comment', raw:line, command:line, explanation:line.slice(1).trim()||'(comment)', icon:'💬' }); continue;
       }
-
-      // Strip leading @ (echo off prefix)
-      const noAt = line.replace(/^@/, '');
+      const noAt = line.replace(/^@/,'');
       const lower = noAt.toLowerCase();
       const parts = noAt.split(/\s+/);
       const cmd = parts[0].toLowerCase();
-
-      // Echo off/on
-      if(lower === 'echo off' || lower === '@echo off') {
-        steps.push({ type:'meta', raw:line, command:noAt, explanation:'Hide command echo — commands won\'t print themselves as they run', icon:'🔇' }); continue;
+      if(lower==='echo off'||lower==='@echo off'){steps.push({type:'meta',raw:line,command:noAt,explanation:'Hide command echo',icon:'🔇'});continue;}
+      if(lower==='echo on'){steps.push({type:'meta',raw:line,command:noAt,explanation:'Show command echo',icon:'🔊'});continue;}
+      if(cmd==='echo'){const msg=parts.slice(1).join(' ');steps.push({type:'output',raw:line,command:noAt,explanation:msg.startsWith('.')||msg===''?'Print blank line':`Print: "${expandVars(msg,vars)}"`,icon:'📢'});continue;}
+      if(cmd==='pause'){steps.push({type:'wait',raw:line,command:noAt,explanation:'Wait for keypress',icon:'⏸'});continue;}
+      if(cmd==='exit'){steps.push({type:'exit',raw:line,command:noAt,explanation:`Exit script${parts[1]?' with code '+parts[1]:''}`,icon:'🚪'});continue;}
+      if(cmd==='cd'||cmd==='chdir'){steps.push({type:'navigate',raw:line,command:noAt,explanation:`Change directory to: ${expandVars(parts.slice(1).join(' '),vars)}`,icon:'📁'});continue;}
+      if(cmd==='md'||cmd==='mkdir'){steps.push({type:'filesystem',raw:line,command:noAt,explanation:`Create directory: ${expandVars(parts.slice(1).join(' '),vars)}`,icon:'📂'});continue;}
+      if(cmd==='rd'||cmd==='rmdir'){const flags=parts.filter(p=>p.startsWith('/'));const dir=parts.filter(p=>!p.startsWith('/')).slice(1).join(' ');steps.push({type:'filesystem',raw:line,command:noAt,explanation:`Delete directory: ${expandVars(dir,vars)}${flags.includes('/s')?' (recursive)':''}`,icon:'🗑'});continue;}
+      if(cmd==='del'||cmd==='erase'){steps.push({type:'filesystem',raw:line,command:noAt,explanation:`Delete: ${expandVars(parts.slice(1).filter(p=>!p.startsWith('/')).join(' '),vars)}`,icon:'🗑'});continue;}
+      if(cmd==='copy'||cmd==='xcopy'||cmd==='robocopy'){steps.push({type:'filesystem',raw:line,command:noAt,explanation:`Copy ${expandVars(parts[1]||'?',vars)} → ${expandVars(parts[2]||'?',vars)}`,icon:'📋'});continue;}
+      if(cmd==='move'){steps.push({type:'filesystem',raw:line,command:noAt,explanation:`Move ${expandVars(parts[1]||'?',vars)} → ${expandVars(parts[2]||'?',vars)}`,icon:'✂️'});continue;}
+      if(cmd==='set'){const rest=parts.slice(1).join(' ');const eq=rest.indexOf('=');if(eq!==-1){const vname=rest.slice(0,eq).trim();const vval=rest.slice(eq+1).trim();vars[vname.toLowerCase()]=vval;steps.push({type:'variable',raw:line,command:noAt,explanation:`Set %${vname}% = "${vval}"`,icon:'📌'});}else{steps.push({type:'variable',raw:line,command:noAt,explanation:`Display variable: ${rest}`,icon:'📌'});}continue;}
+      if(cmd==='call'){steps.push({type:'call',raw:line,command:noAt,explanation:`Call: ${expandVars(parts.slice(1).join(' '),vars)}`,icon:'📞'});continue;}
+      if(cmd==='start'){steps.push({type:'launch',raw:line,command:noAt,explanation:`Launch: ${expandVars(parts.slice(1).filter(p=>!p.startsWith('/')).join(' '),vars)}`,icon:'🚀'});continue;}
+      if(cmd==='python'||cmd==='python3'||cmd==='py'){const s=parts[1]?expandVars(parts[1],vars):'';steps.push({type:'run',raw:line,command:noAt,explanation:s?`Run Python: ${s}`:'Open Python interpreter',icon:'🐍'});continue;}
+      if(cmd==='node'){steps.push({type:'run',raw:line,command:noAt,explanation:`Run Node.js${parts[1]?': '+expandVars(parts[1],vars):' (interactive)'}`,icon:'💚'});continue;}
+      if(cmd==='npm'||cmd==='npx'){steps.push({type:'run',raw:line,command:noAt,explanation:`${cmd.toUpperCase()} ${parts.slice(1).join(' ')}`,icon:'📦'});continue;}
+      if(cmd==='pip'||cmd==='pip3'){const sub=parts[1]?.toLowerCase();const pkg=parts.slice(2).filter(p=>!p.startsWith('-')).join(', ');steps.push({type:'install',raw:line,command:noAt,explanation:sub==='install'?`Install: ${pkg}`:sub==='uninstall'?`Uninstall: ${pkg}`:`pip ${parts.slice(1).join(' ')}`,icon:'🐍'});continue;}
+      if(cmd==='curl'||cmd==='wget'){const url=parts.find(p=>p.startsWith('http'))||parts.slice(1).join(' ');steps.push({type:'network',raw:line,command:noAt,explanation:`Download: ${url}`,icon:'🌐'});continue;}
+      if(cmd==='git'){const sub=parts[1]?.toLowerCase();const actions={clone:'Clone repo',pull:'Pull changes',push:'Push commits',commit:'Create commit',checkout:'Switch branch',init:'Init repo',status:'Show status',add:'Stage files'};steps.push({type:'git',raw:line,command:noAt,explanation:`${actions[sub]||'git '+parts.slice(1).join(' ')}${sub==='clone'&&parts[2]?': '+parts[2]:''}`,icon:'🔀'});continue;}
+      if(cmd==='if'){steps.push({type:'condition',raw:line,command:noAt,explanation:`Conditional: ${parts.slice(1,4).join(' ')}`,icon:'🔀'});continue;}
+      if(cmd==='for'){steps.push({type:'loop',raw:line,command:noAt,explanation:`Loop: ${parts.slice(1).join(' ')}`,icon:'🔁'});continue;}
+      if(cmd==='goto'){steps.push({type:'jump',raw:line,command:noAt,explanation:`Jump to :${parts[1]||'?'}`,icon:'⤵️'});continue;}
+      if(line.startsWith(':')&&!line.startsWith('::')){steps.push({type:'label',raw:line,command:line,explanation:`Label: ${line}`,icon:'🏷'});continue;}
+      if(cmd==='taskkill'){steps.push({type:'process',raw:line,command:noAt,explanation:`Kill process: ${parts.find(p=>p.toLowerCase().startsWith('/im'))?.split(':')[1]||'?'}`,icon:'⛔'});continue;}
+      if(cmd==='timeout'||cmd==='sleep'){steps.push({type:'wait',raw:line,command:noAt,explanation:`Wait ${parts[1]?.replace('/t','')||parts[2]||'?'} second(s)`,icon:'⏱'});continue;}
+      if(cmd==='cls'||cmd==='clear'){steps.push({type:'meta',raw:line,command:noAt,explanation:'Clear terminal screen',icon:'✨'});continue;}
+      if(cmd==='type'||cmd==='cat'){steps.push({type:'output',raw:line,command:noAt,explanation:`Print file: ${expandVars(parts.slice(1).join(' '),vars)}`,icon:'📄'});continue;}
+      if(cmd==='findstr'||cmd==='grep'){steps.push({type:'search',raw:line,command:noAt,explanation:`Search: ${parts.slice(1).join(' ')}`,icon:'🔍'});continue;}
+      if(isShell){
+        if(cmd==='source'||cmd==='.'){steps.push({type:'call',raw:line,command:noAt,explanation:`Source: ${parts.slice(1).join(' ')}`,icon:'📥'});continue;}
+        if(cmd==='export'){steps.push({type:'variable',raw:line,command:noAt,explanation:`Export: ${parts.slice(1).join(' ')}`,icon:'📌'});continue;}
+        if(cmd==='chmod'){steps.push({type:'filesystem',raw:line,command:noAt,explanation:`Permissions: ${parts.slice(1).join(' ')}`,icon:'🔐'});continue;}
+        if(cmd==='ls'||cmd==='dir'){steps.push({type:'output',raw:line,command:noAt,explanation:`List: ${parts.slice(1).join(' ')||'current dir'}`,icon:'📋'});continue;}
+        if(cmd==='pwd'){steps.push({type:'output',raw:line,command:noAt,explanation:'Print working directory',icon:'📍'});continue;}
       }
-      if(lower === 'echo on') {
-        steps.push({ type:'meta', raw:line, command:noAt, explanation:'Show command echo — each command prints before running', icon:'🔊' }); continue;
-      }
-
-      // Echo message
-      if(cmd === 'echo') {
-        const msg = parts.slice(1).join(' ');
-        if(msg.startsWith('.') || msg === '') {
-          steps.push({ type:'output', raw:line, command:noAt, explanation:'Print a blank line to the terminal', icon:'↵' });
-        } else {
-          steps.push({ type:'output', raw:line, command:noAt, explanation:`Print to terminal: "${expandVars(msg, vars)}"`, icon:'📢' });
-        }
-        continue;
-      }
-
-      // Pause
-      if(cmd === 'pause') {
-        steps.push({ type:'wait', raw:line, command:noAt, explanation:'Pause execution and wait for the user to press any key', icon:'⏸' }); continue;
-      }
-
-      // Exit
-      if(cmd === 'exit') {
-        const code = parts[1];
-        steps.push({ type:'exit', raw:line, command:noAt, explanation: code ? `Exit the script with code ${code}` : 'Exit the script / close the terminal window', icon:'🚪' }); continue;
-      }
-
-      // CD / chdir
-      if(cmd === 'cd' || cmd === 'chdir') {
-        const dir = parts.slice(1).join(' ');
-        steps.push({ type:'navigate', raw:line, command:noAt, explanation:`Change working directory to: ${expandVars(dir, vars)}`, icon:'📁' }); continue;
-      }
-
-      // MD / mkdir
-      if(cmd === 'md' || cmd === 'mkdir') {
-        const dir = parts.slice(1).join(' ');
-        steps.push({ type:'filesystem', raw:line, command:noAt, explanation:`Create directory: ${expandVars(dir, vars)}`, icon:'📂' }); continue;
-      }
-
-      // RD / rmdir
-      if(cmd === 'rd' || cmd === 'rmdir') {
-        const flags = parts.filter(p => p.startsWith('/')).map(p => p.toLowerCase());
-        const dir = parts.filter(p => !p.startsWith('/')).slice(1).join(' ');
-        const recursive = flags.includes('/s') ? ' (including all contents)' : '';
-        steps.push({ type:'filesystem', raw:line, command:noAt, explanation:`Delete directory: ${expandVars(dir, vars)}${recursive}`, icon:'🗑' }); continue;
-      }
-
-      // DEL / ERASE
-      if(cmd === 'del' || cmd === 'erase') {
-        const target = parts.slice(1).filter(p => !p.startsWith('/')).join(' ');
-        steps.push({ type:'filesystem', raw:line, command:noAt, explanation:`Delete file(s): ${expandVars(target, vars)}`, icon:'🗑' }); continue;
-      }
-
-      // COPY / XCOPY / ROBOCOPY
-      if(cmd === 'copy' || cmd === 'xcopy' || cmd === 'robocopy') {
-        const src  = parts[1] || '?';
-        const dest = parts[2] || '?';
-        const extra = cmd !== 'copy' ? ` (${cmd === 'xcopy' ? 'with subdirectories' : 'robust/resumable copy'})` : '';
-        steps.push({ type:'filesystem', raw:line, command:noAt, explanation:`Copy ${expandVars(src,vars)} → ${expandVars(dest,vars)}${extra}`, icon:'📋' }); continue;
-      }
-
-      // MOVE
-      if(cmd === 'move') {
-        const src  = parts[1] || '?';
-        const dest = parts[2] || '?';
-        steps.push({ type:'filesystem', raw:line, command:noAt, explanation:`Move/rename ${expandVars(src,vars)} → ${expandVars(dest,vars)}`, icon:'✂️' }); continue;
-      }
-
-      // SET
-      if(cmd === 'set') {
-        const rest = parts.slice(1).join(' ');
-        const eq = rest.indexOf('=');
-        if(eq !== -1) {
-          const vname = rest.slice(0, eq).trim();
-          const vval  = rest.slice(eq+1).trim();
-          vars[vname.toLowerCase()] = vval;
-          steps.push({ type:'variable', raw:line, command:noAt, explanation:`Set variable %${vname}% = "${vval}"`, icon:'📌' });
-        } else {
-          steps.push({ type:'variable', raw:line, command:noAt, explanation:`Display variable: ${rest}`, icon:'📌' });
-        }
-        continue;
-      }
-
-      // CALL
-      if(cmd === 'call') {
-        const target = parts.slice(1).join(' ');
-        steps.push({ type:'call', raw:line, command:noAt, explanation:`Call sub-script or label: ${expandVars(target, vars)}`, icon:'📞' }); continue;
-      }
-
-      // START
-      if(cmd === 'start') {
-        const prog = parts.slice(1).filter(p => !p.startsWith('/')).join(' ');
-        steps.push({ type:'launch', raw:line, command:noAt, explanation:`Launch program/window: ${expandVars(prog, vars)}`, icon:'🚀' }); continue;
-      }
-
-      // Python / py / python3
-      if(cmd === 'python' || cmd === 'python3' || cmd === 'py') {
-        const script = parts[1] ? expandVars(parts[1], vars) : '';
-        const args   = parts.slice(2).join(' ');
-        if(script) {
-          steps.push({ type:'run', raw:line, command:noAt, explanation:`Run Python script: ${script}${args ? ' with args: '+args : ''}`, icon:'🐍' });
-        } else {
-          steps.push({ type:'run', raw:line, command:noAt, explanation:'Open interactive Python interpreter', icon:'🐍' });
-        }
-        continue;
-      }
-
-      // Node / npm / npx
-      if(cmd === 'node') {
-        const script = parts[1] ? expandVars(parts[1], vars) : '';
-        steps.push({ type:'run', raw:line, command:noAt, explanation:`Run Node.js${script ? ': '+script : ' (interactive)'}`, icon:'💚' }); continue;
-      }
-      if(cmd === 'npm' || cmd === 'npx') {
-        steps.push({ type:'run', raw:line, command:noAt, explanation:`${cmd.toUpperCase()} ${parts.slice(1).join(' ')} — Node package manager operation`, icon:'📦' }); continue;
-      }
-
-      // pip
-      if(cmd === 'pip' || cmd === 'pip3') {
-        const sub = parts[1]?.toLowerCase();
-        const pkg = parts.slice(2).filter(p=>!p.startsWith('-')).join(', ');
-        const action = sub === 'install' ? `Install Python package(s): ${pkg}` : sub === 'uninstall' ? `Uninstall Python package(s): ${pkg}` : `pip ${parts.slice(1).join(' ')}`;
-        steps.push({ type:'install', raw:line, command:noAt, explanation:action, icon:'🐍' }); continue;
-      }
-
-      // curl / wget
-      if(cmd === 'curl' || cmd === 'wget') {
-        const url = parts.find(p => p.startsWith('http')) || parts.slice(1).join(' ');
-        steps.push({ type:'network', raw:line, command:noAt, explanation:`Download from: ${url}`, icon:'🌐' }); continue;
-      }
-
-      // git
-      if(cmd === 'git') {
-        const sub = parts[1]?.toLowerCase();
-        const gitActions = { clone:'Clone repository', pull:'Pull latest changes', push:'Push commits', commit:'Create a commit', checkout:'Switch branch/file', init:'Initialize new repository', status:'Show working tree status', add:'Stage files for commit' };
-        const action = gitActions[sub] || `git ${parts.slice(1).join(' ')}`;
-        const detail = sub === 'clone' && parts[2] ? `: ${parts[2]}` : sub === 'checkout' && parts[2] ? ` to ${parts[2]}` : '';
-        steps.push({ type:'git', raw:line, command:noAt, explanation:`${action}${detail}`, icon:'🔀' }); continue;
-      }
-
-      // IF
-      if(cmd === 'if') {
-        steps.push({ type:'condition', raw:line, command:noAt, explanation:`Conditional: if ${parts.slice(1,4).join(' ')} → run command`, icon:'🔀' }); continue;
-      }
-
-      // FOR
-      if(cmd === 'for') {
-        steps.push({ type:'loop', raw:line, command:noAt, explanation:`Loop over items: ${parts.slice(1).join(' ')}`, icon:'🔁' }); continue;
-      }
-
-      // GOTO / labels
-      if(cmd === 'goto') {
-        steps.push({ type:'jump', raw:line, command:noAt, explanation:`Jump to label :${parts[1] || '?'}`, icon:'⤵️' }); continue;
-      }
-      if(line.startsWith(':') && !line.startsWith('::')) {
-        steps.push({ type:'label', raw:line, command:line, explanation:`Define jump label: ${line}`, icon:'🏷' }); continue;
-      }
-
-      // TASKKILL
-      if(cmd === 'taskkill') {
-        const proc = parts.find(p => p.toLowerCase().startsWith('/im'))?.split(':')[1] || parts.find(p => p.toLowerCase().startsWith('/pid'))?.split(':')[1] || '?';
-        steps.push({ type:'process', raw:line, command:noAt, explanation:`Kill process: ${proc}`, icon:'⛔' }); continue;
-      }
-
-      // TIMEOUT / SLEEP
-      if(cmd === 'timeout' || cmd === 'sleep') {
-        const secs = parts[1]?.replace('/t','') || parts[2] || '?';
-        steps.push({ type:'wait', raw:line, command:noAt, explanation:`Wait ${secs} second(s) before continuing`, icon:'⏱' }); continue;
-      }
-
-      // CLS
-      if(cmd === 'cls' || cmd === 'clear') {
-        steps.push({ type:'meta', raw:line, command:noAt, explanation:'Clear the terminal screen', icon:'✨' }); continue;
-      }
-
-      // TYPE / CAT
-      if(cmd === 'type' || cmd === 'cat') {
-        const file = parts.slice(1).join(' ');
-        steps.push({ type:'output', raw:line, command:noAt, explanation:`Print contents of file: ${expandVars(file, vars)}`, icon:'📄' }); continue;
-      }
-
-      // FINDSTR / GREP
-      if(cmd === 'findstr' || cmd === 'grep') {
-        steps.push({ type:'search', raw:line, command:noAt, explanation:`Search for pattern: ${parts.slice(1).join(' ')}`, icon:'🔍' }); continue;
-      }
-
-      // Shell specific: source / export / chmod / ls / pwd
-      if(isShell) {
-        if(cmd === 'source' || cmd === '.') {
-          steps.push({ type:'call', raw:line, command:noAt, explanation:`Source script into current shell: ${parts.slice(1).join(' ')}`, icon:'📥' }); continue;
-        }
-        if(cmd === 'export') {
-          steps.push({ type:'variable', raw:line, command:noAt, explanation:`Export environment variable: ${parts.slice(1).join(' ')}`, icon:'📌' }); continue;
-        }
-        if(cmd === 'chmod') {
-          steps.push({ type:'filesystem', raw:line, command:noAt, explanation:`Change permissions: ${parts.slice(1).join(' ')}`, icon:'🔐' }); continue;
-        }
-        if(cmd === 'ls' || cmd === 'dir') {
-          steps.push({ type:'output', raw:line, command:noAt, explanation:`List files in: ${parts.slice(1).join(' ') || 'current directory'}`, icon:'📋' }); continue;
-        }
-        if(cmd === 'pwd') {
-          steps.push({ type:'output', raw:line, command:noAt, explanation:'Print current working directory path', icon:'📍' }); continue;
-        }
-      }
-
-      // Pipe / redirect
-      if(line.includes('|') || line.includes('>') || line.includes('<')) {
-        steps.push({ type:'pipe', raw:line, command:noAt, explanation:`Run with I/O redirect or pipe: ${noAt}`, icon:'⇄' }); continue;
-      }
-
-      // Generic executable / unknown
-      const ext = cmd.split('.').pop().toLowerCase();
-      if(['exe','msi','cmd','bat','ps1','vbs'].includes(ext) || cmd.includes('\\') || cmd.includes('/')) {
-        steps.push({ type:'run', raw:line, command:noAt, explanation:`Run executable: ${expandVars(noAt, vars)}`, icon:'⚙️' });
-      } else {
-        steps.push({ type:'unknown', raw:line, command:noAt, explanation:`Execute: ${expandVars(noAt, vars)}`, icon:'▶️' });
+      if(line.includes('|')||line.includes('>')||line.includes('<')){steps.push({type:'pipe',raw:line,command:noAt,explanation:`I/O redirect: ${noAt}`,icon:'⇄'});continue;}
+      const ext2=cmd.split('.').pop().toLowerCase();
+      if(['exe','msi','cmd','bat','ps1','vbs'].includes(ext2)||cmd.includes('\\')||cmd.includes('/')){
+        steps.push({type:'run',raw:line,command:noAt,explanation:`Run: ${expandVars(noAt,vars)}`,icon:'⚙️'});
+      }else{
+        steps.push({type:'unknown',raw:line,command:noAt,explanation:`Execute: ${expandVars(noAt,vars)}`,icon:'▶️'});
       }
     }
-
     return steps;
   }
 
@@ -1600,53 +1667,23 @@ window.addEventListener('load', () => {
   }
 
   const batTypeColors = {
-    comment:    '#4a5080',
-    meta:       '#7b5fff',
-    output:     '#00c8ff',
-    wait:       '#ffaa00',
-    exit:       '#ff4466',
-    navigate:   '#00ff9f',
-    filesystem: '#ffcc44',
-    variable:   '#cc88ff',
-    call:       '#00f5ff',
-    launch:     '#00ff9f',
-    run:        '#88ff44',
-    install:    '#44ccff',
-    network:    '#44aaff',
-    git:        '#ff8844',
-    condition:  '#ffdd44',
-    loop:       '#ffdd44',
-    jump:       '#ff8888',
-    label:      '#888888',
-    process:    '#ff4444',
-    pipe:       '#aaaaff',
-    search:     '#44ffcc',
-    done:       '#00ff7f',
-    unknown:    '#aaaaaa',
-    header:     '#00f5ff',
-    subheader:  '#4a5080',
-    divider:    '#1a1a3e',
+    comment:'#4a5080',meta:'#7b5fff',output:'#00c8ff',wait:'#ffaa00',exit:'#ff4466',
+    navigate:'#00ff9f',filesystem:'#ffcc44',variable:'#cc88ff',call:'#00f5ff',
+    launch:'#00ff9f',run:'#88ff44',install:'#44ccff',network:'#44aaff',git:'#ff8844',
+    condition:'#ffdd44',loop:'#ffdd44',jump:'#ff8888',label:'#888888',process:'#ff4444',
+    pipe:'#aaaaff',search:'#44ffcc',done:'#00ff7f',unknown:'#aaaaaa',
+    header:'#00f5ff',subheader:'#4a5080',divider:'#1a1a3e',
   };
 
   function renderBatStep(term, step, num, total) {
     const color = batTypeColors[step.type] || '#aaaaaa';
-
-    // Command line
     const cmdRow = document.createElement('div');
     cmdRow.style.cssText = `display:flex;align-items:flex-start;gap:8px;padding:4px 0;animation:batFadeIn .25s ease;`;
-    cmdRow.innerHTML = `
-      <span style="color:#1a1a3e;font-size:.6rem;min-width:24px;text-align:right;padding-top:1px;">${num}</span>
-      <span style="color:${color};min-width:16px;">${step.icon}</span>
-      <span style="color:#555;flex:1;font-size:.75rem;">${escapeHtml(step.raw)}</span>`;
+    cmdRow.innerHTML = `<span style="color:#1a1a3e;font-size:.6rem;min-width:24px;text-align:right;padding-top:1px;">${num}</span><span style="color:${color};min-width:16px;">${step.icon}</span><span style="color:#555;flex:1;font-size:.75rem;">${escapeHtml(step.raw)}</span>`;
     term.appendChild(cmdRow);
-
-    // Explanation row
     const expRow = document.createElement('div');
     expRow.style.cssText = `display:flex;align-items:flex-start;gap:8px;padding:2px 0 8px 0;border-bottom:1px solid #0d0d1e;`;
-    expRow.innerHTML = `
-      <span style="min-width:24px;"></span>
-      <span style="min-width:16px;"></span>
-      <span style="color:${color};font-size:.72rem;line-height:1.4;">→ ${escapeHtml(step.explanation)}</span>`;
+    expRow.innerHTML = `<span style="min-width:24px;"></span><span style="min-width:16px;"></span><span style="color:${color};font-size:.72rem;line-height:1.4;">→ ${escapeHtml(step.explanation)}</span>`;
     term.appendChild(expRow);
   }
 
@@ -1662,27 +1699,43 @@ window.addEventListener('load', () => {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
-  // Inject keyframe for bat step animation
   (function(){
     const style = document.createElement('style');
-    style.textContent = `@keyframes batFadeIn { from{opacity:0;transform:translateX(-6px);} to{opacity:1;transform:translateX(0);} }`;
+    style.textContent = `@keyframes batFadeIn{from{opacity:0;transform:translateX(-6px);}to{opacity:1;transform:translateX(0);}}`;
     document.head.appendChild(style);
   })();
 
-  function setStatus(s) {
-    document.getElementById('statusText').textContent = s;
-  }
+  function setStatus(s) { document.getElementById('statusText').textContent = s; }
+
+  // ══════════════════════════════════════════════════════════════════
+  // OPEN IN NEW TAB
+  // ══════════════════════════════════════════════════════════════════
 
   function openInBlank() {
     if(state.activeIndex === -1) { showToast('No file loaded!'); return; }
     const f = state.files[state.activeIndex];
     const ext = f.name.split('.').pop().toLowerCase();
     const t = getFileType(f.name);
-
     const w = window.open('about:blank', '_blank');
     if(!w) { showToast('Popup blocked — allow popups!'); return; }
 
-    if(['png','jpg','jpeg','gif','webp','bmp'].includes(ext)) {
+    if(t.viewer === 'mhtml') {
+      if(state.mhtmlReconstructed) {
+        w.document.open();
+        w.document.write(state.mhtmlReconstructed);
+        w.document.close();
+      } else {
+        // Parse on the fly for new tab
+        parseMHTML(f).then(html => {
+          w.document.open();
+          w.document.write(html);
+          w.document.close();
+        }).catch(err => {
+          w.close();
+          showToast('MHTML error: ' + err.message.slice(0,40));
+        });
+      }
+    } else if(['png','jpg','jpeg','gif','webp','bmp'].includes(ext)) {
       // Images: read as base64 and embed directly
       const reader = new FileReader();
       reader.onload = e => {
@@ -1691,7 +1744,6 @@ window.addEventListener('load', () => {
         w.document.close();
       };
       reader.readAsDataURL(f);
-
     } else if(ext === 'svg') {
       const reader = new FileReader();
       reader.onload = e => {
@@ -1700,7 +1752,6 @@ window.addEventListener('load', () => {
         w.document.close();
       };
       reader.readAsText(f);
-
     } else if(t.viewer === 'zip') {
       // Archive (zip/tar/tgz/gz): use already-rewritten HTML
       if(state.zipEntryHTML) {
@@ -1712,8 +1763,7 @@ window.addEventListener('load', () => {
         showToast('Load the archive first!');
         return;
       }
-
-    } else if(['html','htm','mhtml'].includes(ext)) {
+    } else if(['html','htm'].includes(ext)) {
       // HTML: read as text and write directly — stays as about:blank
       const reader = new FileReader();
       reader.onload = e => {
@@ -1722,7 +1772,6 @@ window.addEventListener('load', () => {
         w.document.close();
       };
       reader.readAsText(f);
-
     } else if(t.viewer === 'code') {
       // Code/text: display in a styled code viewer
       const reader = new FileReader();
@@ -1733,7 +1782,6 @@ window.addEventListener('load', () => {
         w.document.close();
       };
       reader.readAsText(f);
-
     } else {
       // Binary / unknown: show info page with download link
       const blobUrl = URL.createObjectURL(f);
@@ -1741,7 +1789,6 @@ window.addEventListener('load', () => {
       w.document.write(`<!DOCTYPE html><html><head><title>${f.name}</title><style>body{margin:0;background:#05050f;color:#e0e8ff;font-family:monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:16px;}a{color:#00f5ff;padding:12px 28px;border:1px solid #00f5ff;border-radius:4px;text-decoration:none;font-size:14px;letter-spacing:.1em;}a:hover{background:#00f5ff;color:#000;}</style></head><body><div style="font-size:3rem;">📦</div><div style="font-size:1.1rem;">${f.name}</div><div style="color:#4a5080;font-size:.85rem;">${t.label} &nbsp;·&nbsp; ${formatSize(f.size)}</div><a href="${blobUrl}" download="${f.name}">⬇ DOWNLOAD FILE</a></body></html>`);
       w.document.close();
     }
-
     showToast('Opened in new tab ✓');
   }
 
@@ -1761,7 +1808,10 @@ window.addEventListener('load', () => {
     }
   }
 
-  // Settings
+  // ══════════════════════════════════════════════════════════════════
+  // SETTINGS
+  // ══════════════════════════════════════════════════════════════════
+
   function openSettingsPanel() { document.getElementById('settingsOverlay').classList.add('open'); }
   function closeSettings() { document.getElementById('settingsOverlay').classList.remove('open'); }
   document.getElementById('settingsOverlay').addEventListener('click', function(e) {
@@ -1773,476 +1823,104 @@ window.addEventListener('load', () => {
     state.theme = theme;
     document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    showToast('Theme applied ✓');
-  }
-
-  function setTheme(theme, btn) {
-    document.body.dataset.theme = theme === 'default' ? '' : theme;
-    state.theme = theme;
-    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
     startThemeAnimation(theme);
     showToast('Theme applied ✓');
   }
 
-  // ── THEME ANIMATION ENGINE ────────────────────────────────────────────────
   let themeAnimId = null;
 
   function startThemeAnimation(theme) {
     const canvas = document.getElementById('themeCanvas');
     const ctx = canvas.getContext('2d');
     if(themeAnimId) { cancelAnimationFrame(themeAnimId); themeAnimId = null; }
-
-    // Resize canvas to fill window
-    function resize() {
-      canvas.width  = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     resize();
     window.addEventListener('resize', resize);
-
     canvas.style.opacity = '0';
-
-    // For default theme: keep orbs visible AND run cyber neon on canvas at low opacity
     if(theme === 'default') {
       canvas.style.opacity = '0.5';
       document.querySelectorAll('.orb').forEach(o => o.style.display = 'block');
-      animateCyberNeon(canvas, ctx);
-      return;
+      animateCyberNeon(canvas, ctx); return;
     }
-
     document.querySelectorAll('.orb').forEach(o => o.style.display = 'none');
     setTimeout(() => canvas.style.opacity = '1', 50);
-
-    if(theme === 'neon-pink')  animateMagma(canvas, ctx);
-    if(theme === 'forest')     animateMatrix(canvas, ctx);
-    if(theme === 'sunset')     animateEmber(canvas, ctx);
-    if(theme === 'void')       animateVoid(canvas, ctx);
+    if(theme === 'neon-pink') animateMagma(canvas, ctx);
+    if(theme === 'forest')    animateMatrix(canvas, ctx);
+    if(theme === 'sunset')    animateEmber(canvas, ctx);
+    if(theme === 'void')      animateVoid(canvas, ctx);
   }
 
-  // ── CYBER: Electric neon grid pulses + lightning arcs ─────────────────────
   function animateCyberNeon(canvas, ctx) {
     const pulses = [];
-    const arcs   = [];
+    const arcs = [];
     let t = 0;
-
-    function spawnPulse() {
-      pulses.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        r: 0, maxR: 80 + Math.random() * 120,
-        alpha: 0.6, color: Math.random() > 0.5 ? '0,245,255' : '255,0,110'
-      });
-    }
-    function spawnArc() {
-      const x1 = Math.random() * canvas.width;
-      const y1 = Math.random() * canvas.height;
-      const segs = [];
-      let cx = x1, cy = y1;
-      for(let i = 0; i < 8 + Math.random()*6; i++) {
-        cx += (Math.random()-0.5)*120;
-        cy += (Math.random()-0.5)*80;
-        segs.push([cx, cy]);
-      }
-      arcs.push({ x1, y1, segs, life: 1, decay: 0.04 + Math.random()*0.04, color: Math.random()>0.5?'0,245,255':'123,47,255' });
-    }
-
+    function spawnPulse() { pulses.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:0,maxR:80+Math.random()*120,alpha:.6,color:Math.random()>.5?'0,245,255':'255,0,110'}); }
+    function spawnArc() { const x1=Math.random()*canvas.width,y1=Math.random()*canvas.height,segs=[];let cx=x1,cy=y1;for(let i=0;i<8+Math.random()*6;i++){cx+=(Math.random()-.5)*120;cy+=(Math.random()-.5)*80;segs.push([cx,cy]);}arcs.push({x1,y1,segs,life:1,decay:.04+Math.random()*.04,color:Math.random()>.5?'0,245,255':'123,47,255'}); }
     for(let i=0;i<6;i++) spawnPulse();
-
     function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      t++;
-
-      // Grid lines pulse
-      ctx.strokeStyle = `rgba(0,245,255,${0.025 + 0.015*Math.sin(t*0.02)})`;
-      ctx.lineWidth = 1;
-      const gSize = 44;
-      const offX = (t * 0.3) % gSize;
-      const offY = (t * 0.3) % gSize;
-      for(let x = -gSize+offX; x < canvas.width+gSize; x+=gSize) {
-        ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke();
-      }
-      for(let y = -gSize+offY; y < canvas.height+gSize; y+=gSize) {
-        ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke();
-      }
-
-      // Radial pulses
-      for(let i = pulses.length-1; i >= 0; i--) {
-        const p = pulses[i];
-        p.r += 2.2;
-        p.alpha = 0.5 * (1 - p.r/p.maxR);
-        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
-        grad.addColorStop(0,   `rgba(${p.color},0)`);
-        grad.addColorStop(0.7, `rgba(${p.color},${p.alpha*0.3})`);
-        grad.addColorStop(1,   `rgba(${p.color},0)`);
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-        ctx.fillStyle = grad;
-        ctx.fill();
-        // Ring
-        ctx.strokeStyle = `rgba(${p.color},${p.alpha})`;
-        ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.stroke();
-        if(p.r >= p.maxR) { pulses.splice(i,1); spawnPulse(); }
-      }
-
-      // Lightning arcs
-      if(t % 18 === 0) spawnArc();
-      for(let i = arcs.length-1; i >= 0; i--) {
-        const a = arcs[i];
-        a.life -= a.decay;
-        if(a.life <= 0) { arcs.splice(i,1); continue; }
-        ctx.strokeStyle = `rgba(${a.color},${a.life * 0.9})`;
-        ctx.lineWidth = a.life * 2;
-        ctx.shadowBlur = 12 * a.life;
-        ctx.shadowColor = `rgba(${a.color},0.8)`;
-        ctx.beginPath();
-        ctx.moveTo(a.x1, a.y1);
-        for(const [sx,sy] of a.segs) ctx.lineTo(sx,sy);
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-      }
-
-      // Scanning beam
-      const scanY = (t * 1.5) % (canvas.height + 40) - 20;
-      const scanGrad = ctx.createLinearGradient(0, scanY-8, 0, scanY+8);
-      scanGrad.addColorStop(0, 'rgba(0,245,255,0)');
-      scanGrad.addColorStop(0.5, 'rgba(0,245,255,0.08)');
-      scanGrad.addColorStop(1, 'rgba(0,245,255,0)');
-      ctx.fillStyle = scanGrad;
-      ctx.fillRect(0, scanY-8, canvas.width, 16);
-
-      themeAnimId = requestAnimationFrame(draw);
+      ctx.clearRect(0,0,canvas.width,canvas.height); t++;
+      ctx.strokeStyle=`rgba(0,245,255,${.025+.015*Math.sin(t*.02)})`;ctx.lineWidth=1;
+      const gSize=44,offX=(t*.3)%gSize,offY=(t*.3)%gSize;
+      for(let x=-gSize+offX;x<canvas.width+gSize;x+=gSize){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke();}
+      for(let y=-gSize+offY;y<canvas.height+gSize;y+=gSize){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke();}
+      for(let i=pulses.length-1;i>=0;i--){const p=pulses[i];p.r+=2.2;p.alpha=.5*(1-p.r/p.maxR);const grad=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r);grad.addColorStop(0,`rgba(${p.color},0)`);grad.addColorStop(.7,`rgba(${p.color},${p.alpha*.3})`);grad.addColorStop(1,`rgba(${p.color},0)`);ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=grad;ctx.fill();ctx.strokeStyle=`rgba(${p.color},${p.alpha})`;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.stroke();if(p.r>=p.maxR){pulses.splice(i,1);spawnPulse();}}
+      if(t%18===0)spawnArc();
+      for(let i=arcs.length-1;i>=0;i--){const a=arcs[i];a.life-=a.decay;if(a.life<=0){arcs.splice(i,1);continue;}ctx.strokeStyle=`rgba(${a.color},${a.life*.9})`;ctx.lineWidth=a.life*2;ctx.shadowBlur=12*a.life;ctx.shadowColor=`rgba(${a.color},.8)`;ctx.beginPath();ctx.moveTo(a.x1,a.y1);for(const[sx,sy]of a.segs)ctx.lineTo(sx,sy);ctx.stroke();ctx.shadowBlur=0;}
+      const scanY=(t*1.5)%(canvas.height+40)-20;const scanGrad=ctx.createLinearGradient(0,scanY-8,0,scanY+8);scanGrad.addColorStop(0,'rgba(0,245,255,0)');scanGrad.addColorStop(.5,'rgba(0,245,255,.08)');scanGrad.addColorStop(1,'rgba(0,245,255,0)');ctx.fillStyle=scanGrad;ctx.fillRect(0,scanY-8,canvas.width,16);
+      themeAnimId=requestAnimationFrame(draw);
     }
     draw();
   }
 
-  // ── MAGMA: Molten lava flowing blobs ──────────────────────────────────────
   function animateMagma(canvas, ctx) {
-    const blobs = [];
-    let t = 0;
-
-    for(let i=0; i<12; i++) {
-      blobs.push({
-        x: Math.random()*canvas.width,
-        y: canvas.height + Math.random()*200,
-        r: 60 + Math.random()*120,
-        vx: (Math.random()-0.5)*0.4,
-        vy: -(0.2 + Math.random()*0.5),
-        hue: 10 + Math.random()*30,  // orange-red range
-        phase: Math.random()*Math.PI*2,
-        wobble: 0.3 + Math.random()*0.5
-      });
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      t++;
-
-      // Dark base gradient
-      const bg = ctx.createLinearGradient(0, canvas.height, 0, 0);
-      bg.addColorStop(0, 'rgba(30,5,0,0.6)');
-      bg.addColorStop(0.4, 'rgba(15,3,0,0.4)');
-      bg.addColorStop(1, 'rgba(5,0,0,0.2)');
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Lava cracks at bottom
-      for(let c=0; c<6; c++) {
-        const cx = (canvas.width/6)*c + (canvas.width/12);
-        const crackAlpha = 0.3 + 0.2*Math.sin(t*0.03 + c);
-        const crackGrad = ctx.createLinearGradient(cx, canvas.height, cx, canvas.height-60);
-        crackGrad.addColorStop(0, `rgba(255,120,0,${crackAlpha})`);
-        crackGrad.addColorStop(1, 'rgba(255,60,0,0)');
-        ctx.strokeStyle = crackGrad;
-        ctx.lineWidth = 2 + Math.sin(t*0.05+c)*1;
-        ctx.beginPath();
-        ctx.moveTo(cx, canvas.height);
-        for(let seg=0; seg<5; seg++) {
-          ctx.lineTo(cx + (Math.random()-0.5)*20, canvas.height - seg*12);
-        }
-        ctx.stroke();
-      }
-
-      // Lava blobs
-      for(const b of blobs) {
-        b.x += b.vx + Math.sin(t*0.008+b.phase)*0.3;
-        b.y += b.vy + Math.cos(t*0.006+b.phase)*0.15;
-        b.phase += 0.008;
-        if(b.y + b.r < -100) {
-          b.y = canvas.height + b.r + Math.random()*100;
-          b.x = Math.random()*canvas.width;
-        }
-
-        const blobAlpha = 0.06 + 0.04*Math.sin(t*0.02+b.phase);
-        const brightness = Math.min(1, (canvas.height - b.y) / canvas.height + 0.3);
-        const grad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r*(1+b.wobble*Math.sin(t*0.04+b.phase)));
-        grad.addColorStop(0,   `hsla(${b.hue+10},100%,70%,${blobAlpha*2})`);
-        grad.addColorStop(0.4, `hsla(${b.hue},100%,50%,${blobAlpha*1.5})`);
-        grad.addColorStop(1,   `hsla(${b.hue-10},100%,30%,0)`);
-        ctx.beginPath();
-        ctx.arc(b.x, b.y, b.r*(1+b.wobble*0.3*Math.sin(t*0.04+b.phase)), 0, Math.PI*2);
-        ctx.fillStyle = grad;
-        ctx.fill();
-      }
-
-      // Heat shimmer lines
-      for(let h=0; h<4; h++) {
-        const hy = canvas.height - 30 - h*25;
-        const shimmerAlpha = (0.04-h*0.008) * (0.6+0.4*Math.sin(t*0.04+h));
-        ctx.fillStyle = `rgba(255,80,0,${shimmerAlpha})`;
-        ctx.fillRect(0, hy, canvas.width, 3 + Math.sin(t*0.05+h)*2);
-      }
-
-      // Ember sparks
-      if(t % 4 === 0 && Math.random() > 0.4) {
-        blobs.push({
-          x: Math.random()*canvas.width,
-          y: canvas.height,
-          r: 2 + Math.random()*5,
-          vx: (Math.random()-0.5)*1.5,
-          vy: -(1 + Math.random()*2),
-          hue: 15 + Math.random()*25,
-          phase: 0, wobble: 0,
-          spark: true
-        });
-      }
-
-      themeAnimId = requestAnimationFrame(draw);
-    }
+    const blobs=[];let t=0;
+    for(let i=0;i<12;i++) blobs.push({x:Math.random()*canvas.width,y:canvas.height+Math.random()*200,r:60+Math.random()*120,vx:(Math.random()-.5)*.4,vy:-(0.2+Math.random()*.5),hue:10+Math.random()*30,phase:Math.random()*Math.PI*2,wobble:.3+Math.random()*.5});
+    function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);t++;
+      const bg=ctx.createLinearGradient(0,canvas.height,0,0);bg.addColorStop(0,'rgba(30,5,0,.6)');bg.addColorStop(.4,'rgba(15,3,0,.4)');bg.addColorStop(1,'rgba(5,0,0,.2)');ctx.fillStyle=bg;ctx.fillRect(0,0,canvas.width,canvas.height);
+      for(const b of blobs){b.x+=b.vx+Math.sin(t*.008+b.phase)*.3;b.y+=b.vy+Math.cos(t*.006+b.phase)*.15;b.phase+=.008;if(b.y+b.r<-100){b.y=canvas.height+b.r+Math.random()*100;b.x=Math.random()*canvas.width;}
+        const blobAlpha=.06+.04*Math.sin(t*.02+b.phase);const grad=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r*(1+b.wobble*Math.sin(t*.04+b.phase)));grad.addColorStop(0,`hsla(${b.hue+10},100%,70%,${blobAlpha*2})`);grad.addColorStop(.4,`hsla(${b.hue},100%,50%,${blobAlpha*1.5})`);grad.addColorStop(1,`hsla(${b.hue-10},100%,30%,0)`);ctx.beginPath();ctx.arc(b.x,b.y,b.r*(1+b.wobble*.3*Math.sin(t*.04+b.phase)),0,Math.PI*2);ctx.fillStyle=grad;ctx.fill();}
+      themeAnimId=requestAnimationFrame(draw);}
     draw();
   }
 
-  // ── MATRIX: Falling katakana/digits ───────────────────────────────────────
   function animateMatrix(canvas, ctx) {
-    const fontSize = 14;
-    const cols = Math.floor(canvas.width / fontSize);
-    const drops = Array.from({length: cols}, () => Math.random()*-50);
-    const chars = '0123456789アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
-    let t = 0;
-
-    function draw() {
-      t++;
-      ctx.fillStyle = 'rgba(5,15,7,0.055)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      for(let i = 0; i < drops.length; i++) {
-        const char = chars[Math.floor(Math.random() * chars.length)];
-        const y = drops[i] * fontSize;
-
-        // Head (bright white-green)
-        if(drops[i] > 0) {
-          ctx.fillStyle = `rgba(180,255,200,0.95)`;
-          ctx.font = `${fontSize}px 'Share Tech Mono', monospace`;
-          ctx.fillText(char, i*fontSize, y);
-        }
-
-        // Body (green gradient)
-        const bodyChar = chars[Math.floor(Math.random() * chars.length)];
-        const bodyAlpha = 0.5 + 0.3*Math.sin(t*0.1+i);
-        ctx.fillStyle = `rgba(0,255,70,${bodyAlpha * 0.7})`;
-        ctx.fillText(bodyChar, i*fontSize, y - fontSize*2);
-
-        // Dim trail
-        ctx.fillStyle = `rgba(0,180,40,0.25)`;
-        ctx.fillText(chars[Math.floor(Math.random()*chars.length)], i*fontSize, y - fontSize*5);
-
-        if(y > canvas.height && Math.random() > 0.975) drops[i] = 0;
-        drops[i] += 0.5;
-      }
-
-      // Occasional bright flash column
-      if(t % 60 === 0) {
-        const flashCol = Math.floor(Math.random()*cols);
-        ctx.fillStyle = 'rgba(0,255,100,0.15)';
-        ctx.fillRect(flashCol*fontSize, 0, fontSize, canvas.height);
-      }
-
-      themeAnimId = requestAnimationFrame(draw);
-    }
+    const fontSize=14,cols=Math.floor(canvas.width/fontSize),drops=Array.from({length:cols},()=>Math.random()*-50);
+    const chars='0123456789アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+    let t=0;
+    function draw(){t++;ctx.fillStyle='rgba(5,15,7,.055)';ctx.fillRect(0,0,canvas.width,canvas.height);
+      for(let i=0;i<drops.length;i++){const char=chars[Math.floor(Math.random()*chars.length)];const y=drops[i]*fontSize;
+        if(drops[i]>0){ctx.fillStyle=`rgba(180,255,200,.95)`;ctx.font=`${fontSize}px 'Share Tech Mono',monospace`;ctx.fillText(char,i*fontSize,y);}
+        ctx.fillStyle=`rgba(0,255,70,${(.5+.3*Math.sin(t*.1+i))*.7})`;ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*fontSize,y-fontSize*2);
+        ctx.fillStyle=`rgba(0,180,40,.25)`;ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*fontSize,y-fontSize*5);
+        if(y>canvas.height&&Math.random()>.975)drops[i]=0;drops[i]+=.5;}
+      themeAnimId=requestAnimationFrame(draw);}
     draw();
   }
 
-  // ── EMBER: Flame ambient lighting + rising embers ─────────────────────────
   function animateEmber(canvas, ctx) {
-    const particles = [];
-    let t = 0;
-
-    function spawnEmber() {
-      particles.push({
-        x: canvas.width*0.2 + Math.random()*canvas.width*0.6,
-        y: canvas.height + 10,
-        r: 1 + Math.random()*3,
-        vx: (Math.random()-0.5)*0.8,
-        vy: -(0.5 + Math.random()*1.5),
-        life: 1,
-        decay: 0.003 + Math.random()*0.006,
-        hue: 15 + Math.random()*30,
-        bright: Math.random() > 0.8
-      });
-    }
-
-    for(let i=0;i<60;i++) {
-      spawnEmber();
-      particles[particles.length-1].y = Math.random()*canvas.height;
-      particles[particles.length-1].life = Math.random();
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      t++;
-
-      // Flame glow at bottom
-      const flameHeight = canvas.height * 0.45;
-      for(let f=0; f<3; f++) {
-        const fw = canvas.width * (0.5 + f*0.15);
-        const fx = canvas.width/2 - fw/2 + Math.sin(t*0.015+f*1.2)*30;
-        const flicker = 0.06 + 0.03*Math.sin(t*0.05+f*0.7);
-        const grad = ctx.createRadialGradient(
-          canvas.width/2, canvas.height, 0,
-          canvas.width/2, canvas.height, flameHeight*(0.7+f*0.15)
-        );
-        grad.addColorStop(0,   `rgba(255,120,0,${flicker*2})`);
-        grad.addColorStop(0.3, `rgba(255,60,0,${flicker})`);
-        grad.addColorStop(0.7, `rgba(180,20,0,${flicker*0.4})`);
-        grad.addColorStop(1,   'rgba(0,0,0,0)');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-      }
-
-      // Warm ambient light on sides
-      const sideAlpha = 0.04 + 0.02*Math.sin(t*0.02);
-      const leftGrad = ctx.createLinearGradient(0,0,canvas.width*0.3,0);
-      leftGrad.addColorStop(0, `rgba(255,80,0,${sideAlpha})`);
-      leftGrad.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = leftGrad; ctx.fillRect(0,0,canvas.width*0.3,canvas.height);
-      const rightGrad = ctx.createLinearGradient(canvas.width,0,canvas.width*0.7,0);
-      rightGrad.addColorStop(0, `rgba(255,60,0,${sideAlpha})`);
-      rightGrad.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = rightGrad; ctx.fillRect(canvas.width*0.7,0,canvas.width*0.3,canvas.height);
-
-      // Rising ember particles
-      if(t % 3 === 0) spawnEmber();
-      for(let i = particles.length-1; i>=0; i--) {
-        const p = particles[i];
-        p.x += p.vx + Math.sin(t*0.03+i*0.1)*0.3;
-        p.y += p.vy;
-        p.life -= p.decay;
-        if(p.life <= 0 || p.y < -10) { particles.splice(i,1); continue; }
-
-        const alpha = p.life * (p.bright ? 0.95 : 0.6);
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI*2);
-        if(p.bright) {
-          ctx.shadowBlur = 8; ctx.shadowColor = `hsla(${p.hue},100%,70%,0.8)`;
-        }
-        const pGrad = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*p.life+1);
-        pGrad.addColorStop(0, `hsla(60,100%,90%,${alpha})`);
-        pGrad.addColorStop(0.4, `hsla(${p.hue},100%,60%,${alpha*0.7})`);
-        pGrad.addColorStop(1, `hsla(${p.hue-10},100%,40%,0)`);
-        ctx.fillStyle = pGrad;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-
-      // Subtle smoke wisps at top
-      for(let s=0; s<3; s++) {
-        const sx = canvas.width*(0.25+s*0.25) + Math.sin(t*0.01+s)*40;
-        const smokeAlpha = 0.015 * Math.sin(t*0.008+s*2);
-        if(smokeAlpha > 0) {
-          const sGrad = ctx.createRadialGradient(sx,80,0,sx,80,120);
-          sGrad.addColorStop(0, `rgba(80,40,20,${smokeAlpha})`);
-          sGrad.addColorStop(1, 'rgba(0,0,0,0)');
-          ctx.fillStyle = sGrad;
-          ctx.fillRect(sx-120,0,240,160);
-        }
-      }
-
-      themeAnimId = requestAnimationFrame(draw);
-    }
+    const particles=[];let t=0;
+    function spawnEmber(){particles.push({x:canvas.width*.2+Math.random()*canvas.width*.6,y:canvas.height+10,r:1+Math.random()*3,vx:(Math.random()-.5)*.8,vy:-(0.5+Math.random()*1.5),life:1,decay:.003+Math.random()*.006,hue:15+Math.random()*30,bright:Math.random()>.8});}
+    for(let i=0;i<60;i++){spawnEmber();particles[particles.length-1].y=Math.random()*canvas.height;particles[particles.length-1].life=Math.random();}
+    function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);t++;
+      const flameHeight=canvas.height*.45;for(let f=0;f<3;f++){const grad=ctx.createRadialGradient(canvas.width/2,canvas.height,0,canvas.width/2,canvas.height,flameHeight*(.7+f*.15));grad.addColorStop(0,`rgba(255,120,0,${.06+.03*Math.sin(t*.05+f*.7)*2})`);grad.addColorStop(.3,`rgba(255,60,0,${.06+.03*Math.sin(t*.05+f*.7)})`);grad.addColorStop(.7,`rgba(180,20,0,${(.06+.03*Math.sin(t*.05+f*.7))*.4})`);grad.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=grad;ctx.fillRect(0,0,canvas.width,canvas.height);}
+      if(t%3===0)spawnEmber();
+      for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx+Math.sin(t*.03+i*.1)*.3;p.y+=p.vy;p.life-=p.decay;if(p.life<=0||p.y<-10){particles.splice(i,1);continue;}
+        const alpha=p.life*(p.bright?.95:.6);ctx.beginPath();ctx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2);if(p.bright){ctx.shadowBlur=8;ctx.shadowColor=`hsla(${p.hue},100%,70%,.8)`;}
+        const pGrad=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*p.life+1);pGrad.addColorStop(0,`hsla(60,100%,90%,${alpha})`);pGrad.addColorStop(.4,`hsla(${p.hue},100%,60%,${alpha*.7})`);pGrad.addColorStop(1,`hsla(${p.hue-10},100%,40%,0)`);ctx.fillStyle=pGrad;ctx.fill();ctx.shadowBlur=0;}
+      themeAnimId=requestAnimationFrame(draw);}
     draw();
   }
 
-  // ── VOID: Slow drifting fog, gentle star field, barely-there aurora ────────
   function animateVoid(canvas, ctx) {
-    const stars = Array.from({length:120}, () => ({
-      x: Math.random()*canvas.width,
-      y: Math.random()*canvas.height,
-      r: 0.3 + Math.random()*1.2,
-      twinkle: Math.random()*Math.PI*2,
-      speed: 0.005 + Math.random()*0.015
-    }));
-    const fogBlobs = Array.from({length:6}, (_, i) => ({
-      x: Math.random()*canvas.width,
-      y: Math.random()*canvas.height,
-      r: 200+Math.random()*300,
-      vx: (Math.random()-0.5)*0.12,
-      vy: (Math.random()-0.5)*0.06,
-      phase: i*(Math.PI*2/6)
-    }));
-    let t = 0;
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      t++;
-
-      // Fog drifts
-      for(const b of fogBlobs) {
-        b.x += b.vx; b.y += b.vy; b.phase += 0.003;
-        if(b.x < -b.r) b.x = canvas.width+b.r;
-        if(b.x > canvas.width+b.r) b.x = -b.r;
-        if(b.y < -b.r) b.y = canvas.height+b.r;
-        if(b.y > canvas.height+b.r) b.y = -b.r;
-        const alpha = 0.018 + 0.008*Math.sin(b.phase);
-        const grad = ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);
-        grad.addColorStop(0, `rgba(80,80,180,${alpha})`);
-        grad.addColorStop(0.5, `rgba(60,60,140,${alpha*0.5})`);
-        grad.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.fillStyle = grad;
-        ctx.fillRect(b.x-b.r, b.y-b.r, b.r*2, b.r*2);
-      }
-
-      // Stars gently twinkle
-      for(const s of stars) {
-        s.twinkle += s.speed;
-        const alpha = 0.2 + 0.3*Math.sin(s.twinkle);
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-        ctx.fillStyle = `rgba(${160+Math.floor(40*Math.sin(s.twinkle))},160,240,${alpha})`;
-        ctx.fill();
-      }
-
-      // Barely visible aurora ribbons
-      for(let a=0; a<2; a++) {
-        const ay = canvas.height*(0.2+a*0.25);
-        const aAlpha = 0.018 + 0.010*Math.sin(t*0.004+a*2.1);
-        ctx.beginPath();
-        ctx.moveTo(0, ay);
-        for(let x=0; x<=canvas.width; x+=40) {
-          const wave = ay + Math.sin((x/canvas.width)*Math.PI*3 + t*0.006 + a) * 30;
-          ctx.lineTo(x, wave);
-        }
-        ctx.lineTo(canvas.width, ay+50); ctx.lineTo(0, ay+50); ctx.closePath();
-        const aGrad = ctx.createLinearGradient(0,ay-20,0,ay+50);
-        aGrad.addColorStop(0, `rgba(100,80,255,0)`);
-        aGrad.addColorStop(0.4, `rgba(120,100,255,${aAlpha})`);
-        aGrad.addColorStop(1, `rgba(80,60,200,0)`);
-        ctx.fillStyle = aGrad;
-        ctx.fill();
-      }
-
-      // Single drifting mote of light
-      const moteX = canvas.width*0.5 + Math.sin(t*0.004)*canvas.width*0.3;
-      const moteY = canvas.height*0.4 + Math.cos(t*0.003)*canvas.height*0.2;
-      const moteAlpha = 0.04 + 0.02*Math.sin(t*0.007);
-      const moteGrad = ctx.createRadialGradient(moteX,moteY,0,moteX,moteY,160);
-      moteGrad.addColorStop(0, `rgba(140,120,255,${moteAlpha})`);
-      moteGrad.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = moteGrad;
-      ctx.fillRect(moteX-160, moteY-160, 320, 320);
-
-      themeAnimId = requestAnimationFrame(draw);
-    }
+    const stars=Array.from({length:120},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:.3+Math.random()*1.2,twinkle:Math.random()*Math.PI*2,speed:.005+Math.random()*.015}));
+    const fogBlobs=Array.from({length:6},(_,i)=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:200+Math.random()*300,vx:(Math.random()-.5)*.12,vy:(Math.random()-.5)*.06,phase:i*(Math.PI*2/6)}));
+    let t=0;
+    function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);t++;
+      for(const b of fogBlobs){b.x+=b.vx;b.y+=b.vy;b.phase+=.003;if(b.x<-b.r)b.x=canvas.width+b.r;if(b.x>canvas.width+b.r)b.x=-b.r;if(b.y<-b.r)b.y=canvas.height+b.r;if(b.y>canvas.height+b.r)b.y=-b.r;const alpha=.018+.008*Math.sin(b.phase);const grad=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);grad.addColorStop(0,`rgba(80,80,180,${alpha})`);grad.addColorStop(.5,`rgba(60,60,140,${alpha*.5})`);grad.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=grad;ctx.fillRect(b.x-b.r,b.y-b.r,b.r*2,b.r*2);}
+      for(const s of stars){s.twinkle+=s.speed;const alpha=.2+.3*Math.sin(s.twinkle);ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(${160+Math.floor(40*Math.sin(s.twinkle))},160,240,${alpha})`;ctx.fill();}
+      for(let a=0;a<2;a++){const ay=canvas.height*(.2+a*.25);const aAlpha=.018+.01*Math.sin(t*.004+a*2.1);ctx.beginPath();ctx.moveTo(0,ay);for(let x=0;x<=canvas.width;x+=40){const wave=ay+Math.sin((x/canvas.width)*Math.PI*3+t*.006+a)*30;ctx.lineTo(x,wave);}ctx.lineTo(canvas.width,ay+50);ctx.lineTo(0,ay+50);ctx.closePath();const aGrad=ctx.createLinearGradient(0,ay-20,0,ay+50);aGrad.addColorStop(0,'rgba(100,80,255,0)');aGrad.addColorStop(.4,`rgba(120,100,255,${aAlpha})`);aGrad.addColorStop(1,'rgba(80,60,200,0)');ctx.fillStyle=aGrad;ctx.fill();}
+      const moteX=canvas.width*.5+Math.sin(t*.004)*canvas.width*.3,moteY=canvas.height*.4+Math.cos(t*.003)*canvas.height*.2;const moteAlpha=.04+.02*Math.sin(t*.007);const moteGrad=ctx.createRadialGradient(moteX,moteY,0,moteX,moteY,160);moteGrad.addColorStop(0,`rgba(140,120,255,${moteAlpha})`);moteGrad.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=moteGrad;ctx.fillRect(moteX-160,moteY-160,320,320);
+      themeAnimId=requestAnimationFrame(draw);}
     draw();
   }
 
@@ -2266,46 +1944,36 @@ window.addEventListener('load', () => {
       if(themeAnimId) { cancelAnimationFrame(themeAnimId); themeAnimId = null; }
       canvas.style.opacity = '0';
       document.querySelectorAll('.orb').forEach(o => o.style.display = 'none');
-      document.body.style.setProperty('--grid', 'transparent');
     }
   }
 
-  // Start default Cyber animation on load
   startThemeAnimation('default');
 
   function toggleScan(btn) {
     btn.classList.toggle('on');
-    const isOn = btn.classList.contains('on');
-    document.body.style.setProperty('--scan', isOn ? 'rgba(0,245,255,0.015)' : 'transparent');
+    document.body.style.setProperty('--scan', btn.classList.contains('on') ? 'rgba(0,245,255,0.015)' : 'transparent');
   }
 
   function toggleClass(btn) { btn.classList.toggle('on'); }
 
-  // Toast
   function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2200);
   }
 
-  // Auto-open toggle sync
   document.getElementById('autoOpenToggle').addEventListener('click', function() {
     state.autoOpen = this.classList.contains('on');
   });
 
-  // Keyboard shortcuts
   document.addEventListener('keydown', e => {
     if(e.key === 'Escape') closeSettings();
     if(e.ctrlKey && e.key === ',') { e.preventDefault(); openSettingsPanel(); }
     if(e.ctrlKey && e.key === 'o') { e.preventDefault(); document.getElementById('fileInput').click(); }
   });
 
-  // Init: drag to body
   document.body.addEventListener('dragover', e => e.preventDefault());
-  document.body.addEventListener('drop', e => {
-    e.preventDefault();
-    addFiles([...e.dataTransfer.files]);
-  });
+  document.body.addEventListener('drop', e => { e.preventDefault(); addFiles([...e.dataTransfer.files]); });
 </script>
 </body>
 </html>
